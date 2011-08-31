@@ -1,5 +1,5 @@
 Name:          mutter
-Version:       3.1.4
+Version:       3.1.90.1
 Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
@@ -119,7 +119,6 @@ gconftool-2 --makefile-install-rule \
 %postun -p /sbin/ldconfig
 
 %files -f %{name}.lang
-%defattr(-,root,root,-)
 %doc README AUTHORS COPYING NEWS HACKING doc/theme-format.txt
 %doc %{_mandir}/man1/mutter.1.gz
 %doc %{_mandir}/man1/mutter-message.1.gz
@@ -133,7 +132,6 @@ gconftool-2 --makefile-install-rule \
 %{_libdir}/mutter/
 
 %files devel
-%defattr(-,root,root,-)
 %{_bindir}/mutter-theme-viewer
 %{_bindir}/mutter-window-demo
 %{_includedir}/*
@@ -143,6 +141,9 @@ gconftool-2 --makefile-install-rule \
 %doc %{_mandir}/man1/mutter-window-demo.1.gz
 
 %changelog
+* Wed Aug 31 2011 Matthias Clasen <mclasen@redhat.com> - 3.1.90.1-1
+- Update to 3.1.90.1
+
 * Wed Jul 27 2011 Matthias Clasen <mclasen@redhat.com> - 3.1.4-1
 - Update to 3.1.4
 
