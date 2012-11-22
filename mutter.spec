@@ -1,12 +1,12 @@
 Name:          mutter
 Version:       3.6.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
 License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
-Source0:       http://download.gnome.org/sources/%{name}/3.5/%{name}-%{version}.tar.xz
+Source0:       http://download.gnome.org/sources/%{name}/3.6/%{name}-%{version}.tar.xz
 
 BuildRequires: clutter-devel >= 1.7.5
 BuildRequires: pango-devel
@@ -131,6 +131,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %doc %{_mandir}/man1/mutter-window-demo.1.gz
 
 %changelog
+* Thu Nov 22 2012 Florian Müllner <fmuellner@redhat.com> - 3.6.2-2
+- Fix upstream URL
+
 * Mon Nov 12 2012 Florian Müllner <fmuellner@redhat.com> - 3.6.2-1
 - Update to 3.6.2
 
