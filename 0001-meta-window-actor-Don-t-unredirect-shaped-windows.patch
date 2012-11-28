@@ -1,4 +1,4 @@
-From 66eac7824a7eb70fdd90109b763e59b70a13739b Mon Sep 17 00:00:00 2001
+From 3d2e4a636bf7144939fa28ad04d14ea2242c8c61 Mon Sep 17 00:00:00 2001
 From: "Jasper St. Pierre" <jstpierre@mecheye.net>
 Date: Thu, 7 Jun 2012 23:31:21 -0400
 Subject: [PATCH] meta-window-actor: Don't unredirect shaped windows
@@ -11,23 +11,25 @@ unredirected, giving the appearance of making the desktop freeze.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=677657
 ---
- src/compositor/meta-window-actor.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/compositor/meta-window-actor.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/compositor/meta-window-actor.c b/src/compositor/meta-window-actor.c
-index 14010a0..2dfde8b 100644
+index 2633372..b8e862b 100644
 --- a/src/compositor/meta-window-actor.c
 +++ b/src/compositor/meta-window-actor.c
-@@ -1202,6 +1202,9 @@ meta_window_actor_should_unredirect (MetaWindowActor *self)
-   if (priv->argb32)
-     return FALSE;
+@@ -1220,7 +1220,10 @@ meta_window_actor_should_unredirect (MetaWindowActor *self)
+   MetaScreen *screen = meta_window_get_screen (metaWindow);
+   MetaWindowActorPrivate *priv = self->priv;
  
-+  if (metaWindow->has_shape)
-+    return FALSE;
-+
-   meta_screen_get_size (screen, &screen_width, &screen_height);
-   meta_window_get_outer_rect (metaWindow, &window_rect);
- 
+-  if (meta_window_is_override_redirect (metaWindow) && priv->opacity == 0xff && !priv->argb32)
++  if (meta_window_is_override_redirect (metaWindow) &&
++      priv->opacity == 0xff &&
++      !priv->argb32 &&
++      !metaWindow->has_shape)
+     {
+       int screen_width, screen_height;
+       MetaRectangle window_rect;
 -- 
 1.8.0
 
