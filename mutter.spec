@@ -1,6 +1,6 @@
 Name:          mutter
 Version:       3.4.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -10,6 +10,12 @@ Source0:       http://download.gnome.org/sources/%{name}/3.4/%{name}-%{version}.
 
 Patch0: mutter-never-slice-shape-mask.patch
 Patch1: mutter-use-cogl-texrect-api.patch
+
+# https://bugzilla.gnome.org/show_bug.cgi?id=677657
+Patch2: 0001-meta-window-actor-Don-t-unredirect-shaped-windows.patch
+
+# https://bugzilla.gnome.org/show_bug.cgi?id=670396
+Patch3: 0001-Resize-the-guard-window-when-the-X-screen-is-resized.patch
 
 BuildRequires: clutter-devel >= 1.7.5
 BuildRequires: pango-devel
@@ -68,6 +74,8 @@ utilities for testing Metacity/Mutter themes.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -136,6 +144,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %doc %{_mandir}/man1/mutter-window-demo.1.gz
 
 %changelog
+* Wed Nov 28 2012 Debarshi Ray <rishi@fedoraproject.org> 3.4.1-4
+- Backport fixes for GNOME #677657 and #670396
+
 * Wed May 09 2012 Adam Jackson <ajax@redhat.com> 3.4.1-3
 - mutter-never-slice-shape-mask.patch, mutter-use-cogl-texrect-api.patch:
   Fix window texturing on hardware without ARB_texture_non_power_of_two

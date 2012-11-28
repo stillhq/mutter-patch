@@ -1,0 +1,43 @@
+From 472662d0996b0b4db6355864c6e7944d31d3d62b Mon Sep 17 00:00:00 2001
+From: Benjamin Berg <benjamin@sipsolutions.net>
+Date: Sun, 14 Oct 2012 12:16:06 +0200
+Subject: [PATCH] Resize the guard window when the X screen is resized.
+
+Fixes bug #670396. Without this fix the guard window may not
+extend over the whole area of the screen after a XRandR
+reconfiguration. The effect being that mouse events are
+delivered to invisible windows.
+---
+ src/core/screen.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/core/screen.c b/src/core/screen.c
+index db9b5ed..e49f7d0 100644
+--- a/src/core/screen.c
++++ b/src/core/screen.c
+@@ -2878,6 +2878,22 @@ meta_screen_resize (MetaScreen *screen,
+   reload_monitor_infos (screen);
+   set_desktop_geometry_hint (screen);
+ 
++  /* Resize the guard window to fill the screen again. */
++  if (screen->guard_window != None)
++    {
++      XWindowChanges changes;
++
++      changes.x = 0;
++      changes.y = 0;
++      changes.width = width;
++      changes.height = height;
++
++      XConfigureWindow(screen->display->xdisplay,
++                       screen->guard_window,
++                       CWX | CWY | CWWidth | CWHeight,
++                       &changes);
++    }
++
+   if (screen->display->compositor)
+     meta_compositor_sync_screen_size (screen->display->compositor,
+ 				      screen, width, height);
+-- 
+1.8.0
+
