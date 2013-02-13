@@ -1,6 +1,6 @@
 Name:          mutter
-Version:       3.6.2
-Release:       2%{?dist}
+Version:       3.6.3
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -131,6 +131,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %doc %{_mandir}/man1/mutter-window-demo.1.gz
 
 %changelog
+* Wed Feb 13 2013 Florian Müllner <fmuellner@redhat.com> - 3.6.3-1
+- Update to 3.6.3
+
 * Thu Nov 22 2012 Florian Müllner <fmuellner@redhat.com> - 3.6.2-2
 - Fix upstream URL
 
