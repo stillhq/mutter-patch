@@ -6,7 +6,7 @@ Summary:       Window and compositing manager based on Clutter
 Group:         User Interface/Desktops
 License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
-Source0:       http://download.gnome.org/sources/%{name}/3.7/%{name}-%{version}.tar.xz
+Source0:       http://download.gnome.org/sources/%{name}/3.8/%{name}-%{version}.tar.xz
 
 BuildRequires: clutter-devel >= 1.13.5
 BuildRequires: pango-devel
