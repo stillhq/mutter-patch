@@ -1,0 +1,28 @@
+From 992b97d565af314d087f7074d57e73802c24e01e Mon Sep 17 00:00:00 2001
+From: Lionel Landwerlin <llandwerlin@gmail.com>
+Date: Wed, 16 Oct 2013 21:29:54 +0100
+Subject: [PATCH] window: don't ignore resize button release event for
+ move/resize actions
+
+https://bugzilla.gnome.org/show_bug.cgi?id=710251
+---
+ src/core/window.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index c7c2495..1501b1a 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -9711,7 +9711,8 @@ meta_window_handle_mouse_grab_op_event (MetaWindow *window,
+   switch (xev->evtype)
+     {
+     case XI_ButtonRelease:
+-      if (xev->detail == 1)
++      if (xev->detail == 1 ||
++          xev->detail == meta_prefs_get_mouse_button_resize ())
+         {
+           meta_display_check_threshold_reached (window->display,
+                                                 xev->root_x,
+-- 
+1.8.4.2
+
