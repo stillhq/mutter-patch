@@ -1,0 +1,208 @@
+From 5cfc1461a1a250b54734e1a710537b1b7537d8a7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>
+Date: Thu, 31 Oct 2013 14:37:44 +0100
+Subject: [PATCH] xrandr: use "hotplug_mode_update" property
+
+Use the "hotplug_mode_update" connector property indicating that the
+screen settings should be updated: get a new preferred mode on hotplug
+events to handle dynamic guest resizing (where you resize the host
+window and the guest resizes with it).
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711216
+---
+ src/core/monitor-config.c  | 16 +++++++++
+ src/core/monitor-private.h |  4 +++
+ src/core/monitor-xrandr.c  | 83 ++++++++++++++++++++++++++++++++++------------
+ src/meta/atomnames.h       |  1 +
+ 4 files changed, 83 insertions(+), 21 deletions(-)
+
+diff --git a/src/core/monitor-config.c b/src/core/monitor-config.c
+index 82ea0b1..1186a2b 100644
+--- a/src/core/monitor-config.c
++++ b/src/core/monitor-config.c
+@@ -816,6 +816,22 @@ meta_monitor_config_match_current (MetaMonitorConfig  *self,
+   return ok;
+ }
+ 
++gboolean
++meta_monitor_manager_has_hotplug_mode_update (MetaMonitorManager *manager)
++{
++  MetaOutput *outputs;
++  unsigned n_outputs;
++  unsigned int i;
++
++  outputs = meta_monitor_manager_get_outputs (manager, &n_outputs);
++
++  for (i = 0; i < n_outputs; i++)
++    if (outputs[i].hotplug_mode_update)
++      return TRUE;
++
++  return FALSE;
++}
++
+ static MetaConfiguration *
+ meta_monitor_config_get_stored (MetaMonitorConfig *self,
+ 				MetaOutput        *outputs,
+diff --git a/src/core/monitor-private.h b/src/core/monitor-private.h
+index beef289..bbe73f5 100644
+--- a/src/core/monitor-private.h
++++ b/src/core/monitor-private.h
+@@ -116,6 +116,9 @@ struct _MetaOutput
+   */
+   gboolean is_primary;
+   gboolean is_presentation;
++
++  /* get a new preferred mode on hotplug events, to handle dynamic guest resizing */
++  gboolean hotplug_mode_update;
+ };
+ 
+ struct _MetaCRTC
+@@ -383,6 +386,7 @@ void               meta_output_info_free (MetaOutputInfo *info);
+ 
+ void               meta_monitor_manager_free_output_array (MetaOutput *old_outputs,
+                                                            int         n_old_outputs);
++gboolean           meta_monitor_manager_has_hotplug_mode_update (MetaMonitorManager *manager);
+ 
+ /* Returns true if transform causes width and height to be inverted
+    This is true for the odd transforms in the enum */
+diff --git a/src/core/monitor-xrandr.c b/src/core/monitor-xrandr.c
+index cd9cf82..d8ee2a2 100644
+--- a/src/core/monitor-xrandr.c
++++ b/src/core/monitor-xrandr.c
+@@ -311,6 +311,29 @@ read_output_edid (MetaMonitorManagerXrandr *manager_xrandr,
+   return NULL;
+ }
+ 
++static gboolean
++output_get_hotplug_mode_update (MetaMonitorManagerXrandr *manager_xrandr,
++                                XID                       output_id)
++{
++  MetaDisplay *display = meta_get_display ();
++  XRRPropertyInfo *info;
++  gboolean result = FALSE;
++
++  meta_error_trap_push (display);
++  info = XRRQueryOutputProperty (manager_xrandr->xdisplay, output_id,
++                                 display->atom_hotplug_mode_update);
++  meta_error_trap_pop (display);
++
++  if (info)
++    {
++      result = TRUE;
++      XFree (info);
++    }
++
++  return result;
++}
++
++
+ static void
+ meta_monitor_manager_xrandr_read_current (MetaMonitorManager *manager)
+ {
+@@ -484,6 +507,8 @@ meta_monitor_manager_xrandr_read_current (MetaMonitorManager *manager)
+ 	  meta_output->width_mm = output->mm_width;
+ 	  meta_output->height_mm = output->mm_height;
+ 	  meta_output->subpixel_order = COGL_SUBPIXEL_ORDER_UNKNOWN;
++          meta_output->hotplug_mode_update =
++              output_get_hotplug_mode_update (manager_xrandr, meta_output->output_id);
+ 
+ 	  meta_output->n_modes = output->nmode;
+ 	  meta_output->modes = g_new0 (MetaMonitorMode *, meta_output->n_modes);
+@@ -971,6 +996,16 @@ meta_monitor_manager_xrandr_set_crtc_gamma (MetaMonitorManager *manager,
+   XRRFreeGamma (gamma);
+ }
+ 
++static void
++meta_monitor_manager_xrandr_rebuild_derived (MetaMonitorManager *manager)
++{
++  /* This will be a no-op if the change was from our side, as
++     we already called it in the DBus method handler */
++  meta_monitor_config_update_current (manager->config, manager);
++
++  meta_monitor_manager_rebuild_derived (manager);
++}
++
+ static gboolean
+ meta_monitor_manager_xrandr_handle_xevent (MetaMonitorManager *manager,
+ 					   XEvent             *event)
+@@ -980,6 +1015,7 @@ meta_monitor_manager_xrandr_handle_xevent (MetaMonitorManager *manager,
+   MetaCRTC *old_crtcs;
+   MetaMonitorMode *old_modes;
+   int n_old_outputs;
++  gboolean new_config;
+ 
+   if ((event->type - manager_xrandr->rr_event_base) != RRScreenChangeNotify)
+     return FALSE;
+@@ -995,31 +1031,36 @@ meta_monitor_manager_xrandr_handle_xevent (MetaMonitorManager *manager,
+   manager->serial++;
+   meta_monitor_manager_xrandr_read_current (manager);
+ 
+-  /* Check if the current intended configuration has the same outputs
+-     as the new real one, or if the event is a result of an XRandR call.
+-     If so, we can go straight to rebuild the logical config and tell
+-     the outside world.
+-     Otherwise, this event was caused by hotplug, so give a chance to
+-     MetaMonitorConfig.
+-
+-     Note that we need to check both the timestamps and the list of
+-     outputs, because the X server might emit spurious events with
+-     new configTimestamps (bug 702804), and the driver may have
+-     changed the EDID for some other reason (old broken qxl and vbox
+-     drivers...).
+-  */
+-  if (manager_xrandr->resources->timestamp >= manager_xrandr->resources->configTimestamp ||
+-      meta_monitor_config_match_current (manager->config, manager))
+-    {
+-      /* This will be a no-op if the change was from our side, as
+-         we already called it in the DBus method handler */
+-      meta_monitor_config_update_current (manager->config, manager);
++  new_config = manager_xrandr->resources->timestamp >=
++    manager_xrandr->resources->configTimestamp;
++  if (meta_monitor_manager_has_hotplug_mode_update (manager))
+ 
+-      meta_monitor_manager_rebuild_derived (manager);
++    {
++      /* Check if the current intended configuration is a result of an
++         XRandR call.  Otherwise, hotplug_mode_update tells us to get
++         a new preferred mode on hotplug events to handle dynamic
++         guest resizing. */
++      if (new_config)
++        meta_monitor_manager_xrandr_rebuild_derived (manager);
++      else
++        meta_monitor_config_make_default (manager->config, manager);
+     }
+   else
+     {
+-      if (!meta_monitor_config_apply_stored (manager->config, manager))
++      /* Check if the current intended configuration has the same outputs
++         as the new real one, or if the event is a result of an XRandR call.
++         If so, we can go straight to rebuild the logical config and tell
++         the outside world.
++         Otherwise, this event was caused by hotplug, so give a chance to
++         MetaMonitorConfig.
++
++         Note that we need to check both the timestamps and the list of
++         outputs, because the X server might emit spurious events with new
++         configTimestamps (bug 702804), and the driver may have changed
++         the EDID for some other reason (old qxl and vbox drivers). */
++      if (new_config || meta_monitor_config_match_current (manager->config, manager))
++        meta_monitor_manager_xrandr_rebuild_derived (manager);
++      else if (!meta_monitor_config_apply_stored (manager->config, manager))
+         meta_monitor_config_make_default (manager->config, manager);
+     }
+ 
+diff --git a/src/meta/atomnames.h b/src/meta/atomnames.h
+index d7a6e7e..8b7346a 100644
+--- a/src/meta/atomnames.h
++++ b/src/meta/atomnames.h
+@@ -81,6 +81,7 @@ item(TIMESTAMP)
+ item(VERSION)
+ item(ATOM_PAIR)
+ item(BACKLIGHT)
++item(hotplug_mode_update)
+ 
+ /* Oddities: These are used, and we need atoms for them,
+  * but when we need all _NET_WM hints (i.e. when we're making
+-- 
+1.8.4.2
+
