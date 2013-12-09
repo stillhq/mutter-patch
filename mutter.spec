@@ -1,6 +1,6 @@
 Name:          mutter
 Version:       3.10.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -10,6 +10,7 @@ URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.10/%{name}-%{version}.tar.xz
 
 Patch1: 0001-xrandr-use-hotplug_mode_update-property.patch
+Patch2: 0001-MetaWindowGroup-fix-paint-volume.patch
 
 BuildRequires: clutter-devel >= 1.13.5
 BuildRequires: pango-devel
@@ -68,6 +69,7 @@ utilities for testing Metacity/Mutter themes.
 %setup -q
 
 %patch1 -p1 -b .hotplug-mode-update
+%patch2 -p1
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -131,6 +133,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %exclude %{_datadir}/gtk-doc
 
 %changelog
+* Mon Dec  9 2013 Matthias Clasen <mclasen@redhat.com> - 3.10.2-3
+- Include a fix for lingering shadows
+ 
 * Thu Nov 14 2013 Florian Müllner <fmuellner@redhat.com> - 3.10.2-2
 - Include support for hotplug_mode_update property
 
