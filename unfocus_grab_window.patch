@@ -1,0 +1,30 @@
+From 13a4cddd01f523b5b502e79048fcd96371da4fc7 Mon Sep 17 00:00:00 2001
+From: "Owen W. Taylor" <otaylor@fishsoup.net>
+Date: Wed, 18 Dec 2013 09:23:08 -0500
+Subject: [PATCH] Be willing to unfocus the grab window when we are unmanaging
+ it
+
+When we are unmanaging the grab window, we /need/ to unfocus it,
+so we shouldn't bail out early from meta_window_focus().
+
+https://bugzilla.gnome.org/show_bug.cgi?id=711618
+---
+ src/core/window.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index a26ee09..39aac07 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -5998,7 +5998,8 @@ meta_window_focus (MetaWindow  *window,
+               window->desc, window->input, window->take_focus);
+ 
+   if (window->display->grab_window &&
+-      window->display->grab_window->all_keys_grabbed)
++      window->display->grab_window->all_keys_grabbed &&
++      !window->display->grab_window->unmanaging)
+     {
+       meta_topic (META_DEBUG_FOCUS,
+                   "Current focus window %s has global keygrab, not focusing window %s after all\n",
+-- 
+1.8.4.2

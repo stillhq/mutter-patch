@@ -1,6 +1,6 @@
 Name:          mutter
 Version:       3.10.2
-Release:       5%{?dist}
+Release:       6%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -11,9 +11,11 @@ Source0:       http://download.gnome.org/sources/%{name}/3.10/%{name}-%{version}
 
 Patch1: 0001-xrandr-use-hotplug_mode_update-property.patch
 Patch2: 0001-MetaWindowGroup-fix-paint-volume.patch
-# Disabled as it causes BGO #711618 - re-enable when we have a fix for
-# that signed off and backportable - adamw 2013/12
-#Patch3: 0001-display-Don-t-focus-the-no-focus-window-when-sending.patch
+# https://bugzilla.gnome.org/show_bug.cgi?id=710296
+Patch3: 0001-display-Don-t-focus-the-no-focus-window-when-sending.patch
+# https://bugzilla.gnome.org/show_bug.cgi?id=711618
+Patch4: unfocus_grab_window.patch
+Patch5: dont_leave_focus.patch
 
 BuildRequires: clutter-devel >= 1.13.5
 BuildRequires: pango-devel
@@ -73,9 +75,9 @@ utilities for testing Metacity/Mutter themes.
 
 %patch1 -p1 -b .hotplug-mode-update
 %patch2 -p1
-# Disabled as it causes BGO #711618 - re-enable when we have a fix for
-# that signed off and backportable - adamw 2013/12
-#patch3 -p1 
+%patch3 -p1 
+%patch4 -p1
+%patch5 -p1
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -139,6 +141,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %exclude %{_datadir}/gtk-doc
 
 %changelog
+* Mon Dec 23 2013 Adam Williamson <awilliam@redhat.com> - 3.10.2-6
+include both BGO #710296 and BGO #711618 fixes
+
 * Mon Dec 23 2013 Adam Williamson <awilliam@redhat.com> - 3.10.2-5
 - revert the OSK fix as it triggered another bug, BGO #711618
 
