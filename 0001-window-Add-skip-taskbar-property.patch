@@ -1,0 +1,80 @@
+From 47758f0f5f613cec0094e8cbc5274287943dbe09 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Florian=20M=C3=BCllner?= <fmuellner@gnome.org>
+Date: Thu, 30 Jan 2014 16:40:59 +0100
+Subject: [PATCH] window: Add "skip-taskbar" property
+
+We currently only have a method to query the skip-taskbar hint.
+Add a corresponding property to allow listening for change
+notifications.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=723307
+---
+ src/core/window.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index fba7e02..fdbd3b4 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -175,6 +175,7 @@ enum {
+   PROP_USER_TIME,
+   PROP_DEMANDS_ATTENTION,
+   PROP_URGENT,
++  PROP_SKIP_TASKBAR,
+   PROP_MUTTER_HINTS,
+   PROP_APPEARS_FOCUSED,
+   PROP_RESIZEABLE,
+@@ -308,6 +309,9 @@ meta_window_get_property(GObject         *object,
+     case PROP_URGENT:
+       g_value_set_boolean (value, win->wm_hints_urgent);
+       break;
++    case PROP_SKIP_TASKBAR:
++      g_value_set_boolean (value, win->skip_taskbar);
++      break;
+     case PROP_MUTTER_HINTS:
+       g_value_set_string (value, win->mutter_hints);
+       break;
+@@ -469,6 +473,14 @@ meta_window_class_init (MetaWindowClass *klass)
+                                                          G_PARAM_READABLE));
+ 
+   g_object_class_install_property (object_class,
++                                   PROP_SKIP_TASKBAR,
++                                   g_param_spec_boolean ("skip-taskbar",
++                                                         "Skip taskbar",
++                                                         "Whether the skip-taskbar flag of WM_HINTS is set",
++                                                         FALSE,
++                                                         G_PARAM_READABLE));
++
++  g_object_class_install_property (object_class,
+                                    PROP_MUTTER_HINTS,
+                                    g_param_spec_string ("mutter-hints",
+                                                         "_MUTTER_HINTS",
+@@ -8280,6 +8292,7 @@ recalc_window_features (MetaWindow *window)
+   gboolean old_has_resize_func;
+   gboolean old_has_shade_func;
+   gboolean old_always_sticky;
++  gboolean old_skip_taskbar;
+ 
+   old_has_close_func = window->has_close_func;
+   old_has_minimize_func = window->has_minimize_func;
+@@ -8287,6 +8300,7 @@ recalc_window_features (MetaWindow *window)
+   old_has_resize_func = window->has_resize_func;
+   old_has_shade_func = window->has_shade_func;
+   old_always_sticky = window->always_sticky;
++  old_skip_taskbar = window->skip_taskbar;
+ 
+   /* Use MWM hints initially */
+   window->decorated = window->mwm_decorated;
+@@ -8479,6 +8493,9 @@ recalc_window_features (MetaWindow *window)
+               window->skip_taskbar,
+               window->skip_pager);
+ 
++  if (old_skip_taskbar != window->skip_taskbar)
++    g_object_notify (G_OBJECT (window), "skip-taskbar");
++
+   /* FIXME:
+    * Lame workaround for recalc_window_features
+    * being used overzealously. The fix is to
+-- 
+1.8.5.3
+

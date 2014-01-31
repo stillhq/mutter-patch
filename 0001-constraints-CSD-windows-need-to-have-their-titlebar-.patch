@@ -1,0 +1,29 @@
+From 477eb1afed74f49bce8862e09e5dab37be7d4caf Mon Sep 17 00:00:00 2001
+From: "Jasper St. Pierre" <jstpierre@mecheye.net>
+Date: Tue, 21 Jan 2014 12:59:51 -0500
+Subject: [PATCH] constraints: CSD windows need to have their titlebar kept
+ onscreen too
+
+GTK+ CSD windows are considered undecorated by the code, so we should
+not force ourselves to only run on decorated windows.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=719772
+---
+ src/core/constraints.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/core/constraints.c b/src/core/constraints.c
+index 20a918b..96de77a 100644
+--- a/src/core/constraints.c
++++ b/src/core/constraints.c
+@@ -1390,7 +1390,6 @@ constrain_titlebar_visible (MetaWindow         *window,
+       window->type == META_WINDOW_DOCK    ||
+       window->fullscreen                  ||
+       !window->require_titlebar_visible   ||
+-      !window->decorated                  ||
+       unconstrained_user_action)
+     return TRUE;
+ 
+-- 
+1.8.5.3
+
