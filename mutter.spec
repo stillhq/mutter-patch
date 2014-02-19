@@ -1,5 +1,5 @@
 Name:          mutter
-Version:       3.10.3
+Version:       3.10.4
 Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
