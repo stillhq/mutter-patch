@@ -1,6 +1,6 @@
 Name:          mutter
 Version:       3.10.3
-Release:       2%{?dist}
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -8,9 +8,6 @@ License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.10/%{name}-%{version}.tar.xz
-
-Patch0: 0001-constraints-CSD-windows-need-to-have-their-titlebar-.patch
-Patch1: 0001-window-Add-skip-taskbar-property.patch
 
 BuildRequires: clutter-devel >= 1.13.5
 BuildRequires: pango-devel
@@ -67,9 +64,6 @@ utilities for testing Metacity/Mutter themes.
 
 %prep
 %setup -q
-
-%patch0 -p1 -b .keep-csd-titlebars-onscreen
-%patch1 -p1 -b .add-skip-taskbar-property
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -133,6 +127,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %exclude %{_datadir}/gtk-doc
 
 %changelog
+* Wed Feb 19 2014 Florian Müllner <fmuellner@redhat.com> - 3.10.4-1
+- Update to 3.10.4, drop included downstream patches
+
 * Fri Jan 31 2014 Florian Müllner <fmuellner@redhat.com> - 3.10.3-2
 - Backport upstream patches for
  - CSD titlebars being placed off-screen
