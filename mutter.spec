@@ -1,6 +1,6 @@
 Name:          mutter
 Version:       3.10.4
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -8,6 +8,8 @@ License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.10/%{name}-%{version}.tar.xz
+
+Patch1: 0001-window-actor-Guard-against-NULL-frame-mask.patch
 
 BuildRequires: clutter-devel >= 1.13.5
 BuildRequires: pango-devel
@@ -64,6 +66,7 @@ utilities for testing Metacity/Mutter themes.
 
 %prep
 %setup -q
+%patch1 -p1 -b .prevent-crash-with-overly-large-windows
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -127,6 +130,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %exclude %{_datadir}/gtk-doc
 
 %changelog
+* Thu Apr 10 2014 Florian Müllner <fmuellner@redhat.com> - 3.10.4-2
+- Backport patch to prevent crash with overly large windows (#1043659)
+
 * Wed Feb 19 2014 Florian Müllner <fmuellner@redhat.com> - 3.10.4-1
 - Update to 3.10.4, drop included downstream patches
 
