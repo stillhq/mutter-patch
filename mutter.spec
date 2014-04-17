@@ -9,7 +9,7 @@ License:       GPLv2+
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.12/%{name}-%{version}.tar.xz
 
-BuildRequires: clutter-devel >= 1.13.5
+BuildRequires: clutter-devel >= 1.15.90
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
 BuildRequires: gnome-desktop3-devel
@@ -32,9 +32,9 @@ BuildRequires: gtk-doc gnome-common intltool
 BuildRequires: libcanberra-devel
 BuildRequires: gsettings-desktop-schemas-devel
 
-# Make sure this can't be installed with an old gnome-shell build because of
-# an ABI change.
-Conflicts: gnome-shell < 3.9.90
+# Make sure yum updates gnome-shell as well; otherwise we might end up with
+# broken gnome-shell installations due to mutter ABI changes.
+Conflicts: gnome-shell < 3.12.0
 
 Requires: control-center-filesystem
 Requires: startup-notification
