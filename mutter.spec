@@ -1,8 +1,8 @@
 %global clutter_version 1.19.6-3
 
 Name:          mutter
-Version:       3.14.1
-Release:       2%{?dist}
+Version:       3.14.1.5
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -10,8 +10,6 @@ License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.14/%{name}-%{version}.tar.xz
-
-Patch0: 0001-display-Fix-accidental-inversion-from-2f9c601.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -77,7 +75,6 @@ utilities for testing Metacity/Mutter themes.
 
 %prep
 %setup -q
-%patch0 -p1 -b .fix-raise-on-click-regression
 
 %build
 (if ! test -x configure; then NOCONFIGURE=1 ./autogen.sh; fi;
@@ -142,6 +139,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %exclude %{_datadir}/gtk-doc
 
 %changelog
+* Thu Oct 30 2014 Florian Müllner <fmuellner@redhat.com> - 3.14.1.5-1
+- Update to 3.14.1.5
+
 * Tue Oct 21 2014 Florian Müllner <fmuellner@redhat.com> - 3.14.1-2
 - Fix regression in handling raise-on-click option (rhbz#1151918)
 
