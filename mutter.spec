@@ -3,7 +3,7 @@
 
 Name:          mutter
 Version:       3.16.1.1
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -11,6 +11,7 @@ License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}.tar.xz
+Patch1:        backend-x11-Fix-set_scroll_button.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -94,6 +95,7 @@ the functionality of the installed %{name} package.
 
 %prep
 %setup -q
+%patch1 -p1 -b .libinput-fix
 
 %build
 autoreconf -f -i
@@ -164,6 +166,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Fri May 01 2015 Adel Gadllah <adel.gadllah@gmail.com> - 3.16.1.1-3
+- Fix wrong libinput property setting, RH #1214120
+
 * Thu Apr 16 2015 Kalev Lember <kalevlember@gmail.com> - 3.16.1.1-2
 - Bump gnome-shell conflicts version
 
