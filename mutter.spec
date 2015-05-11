@@ -3,7 +3,7 @@
 
 Name:          mutter
 Version:       3.16.1.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -11,6 +11,9 @@ License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}.tar.xz
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1200901
+Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
 Patch1:        backend-x11-Fix-set_scroll_button.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
@@ -95,6 +98,7 @@ the functionality of the installed %{name} package.
 
 %prep
 %setup -q
+%patch0 -p1 -b .fix-cursor
 %patch1 -p1 -b .libinput-fix
 
 %build
@@ -166,8 +170,15 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Mon May 11 2015 Ray Strode <rstrode@redhat.com> 3.17.1-2
+- workaround qxl cursor visibility wonkiness
+  Related: #1200901
+
 * Fri May 01 2015 Adel Gadllah <adel.gadllah@gmail.com> - 3.16.1.1-3
 - Fix wrong libinput property setting, RH #1214120
+
+* Thu Apr 30 2015 Florian Müllner <fmuellner@redhat.com> - 3.17.1-1
+- Update to 3.17.1
 
 * Thu Apr 16 2015 Kalev Lember <kalevlember@gmail.com> - 3.16.1.1-2
 - Bump gnome-shell conflicts version
