@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.16.1.1
-Release:       4%{?dist}
+Version:       3.16.2
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -14,7 +14,6 @@ Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
-Patch1:        backend-x11-Fix-set_scroll_button.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -99,7 +98,6 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1 -b .fix-cursor
-%patch1 -p1 -b .libinput-fix
 
 %build
 autoreconf -f -i
@@ -170,6 +168,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu May 14 2015 Florian Müllner <fmuellner@redhat.com> - 3.16.2-1
+- Update to 3.16.2
+
 * Mon May 11 2015 Ray Strode <rstrode@redhat.com> 3.17.1-2
 - workaround qxl cursor visibility wonkiness
   Related: #1200901
