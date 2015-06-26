@@ -3,7 +3,7 @@
 
 Name:          mutter
 Version:       3.16.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -14,6 +14,7 @@ Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
+Patch1:        0001-input-settings-x11-check-properties-for-correctness-.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -98,6 +99,7 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1 -b .fix-cursor
+%patch1 -p1 -b .property-correctnes
 
 %build
 autoreconf -f -i
@@ -168,6 +170,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Fri Jun 26 2015 Peter Hutterer <peter.hutterer@redhat.com> 3.16.2-2
+- Don't crash when trying to enable two-finger scrolling on a single-finger
+  touchpad (#1228011)
+
 * Thu May 14 2015 Florian Müllner <fmuellner@redhat.com> - 3.16.2-1
 - Update to 3.16.2
 
