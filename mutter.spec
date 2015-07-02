@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.16.2
-Release:       2%{?dist}
+Version:       3.16.3
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -170,6 +170,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Jul 02 2015 Florian Müllner <fmuellner@redhat.com> - 3.16.3-1
+- Update to 3.16.3
+
 * Fri Jun 26 2015 Peter Hutterer <peter.hutterer@redhat.com> 3.16.2-2
 - Don't crash when trying to enable two-finger scrolling on a single-finger
   touchpad (#1228011)
