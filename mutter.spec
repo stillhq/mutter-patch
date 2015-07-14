@@ -3,7 +3,7 @@
 
 Name:          mutter
 Version:       3.16.3
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -15,6 +15,7 @@ Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
 Patch1:        0001-input-settings-x11-check-properties-for-correctness-.patch
+Patch2:        0001-frames-handle-META_FRAME_CONTROL_NONE-on-left-click.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -100,6 +101,7 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1 -b .fix-cursor
 %patch1 -p1 -b .property-correctnes
+%patch2 -p1 -b .meta-frame-control-none
 
 %build
 autoreconf -f -i
@@ -170,6 +172,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Tue Jul 14 2015 Michael Catanzaro <mcatanzaro@gnome.org> - 3.16.3-2
+- Don't crash when e.g. trying to resize a window that cannot be resized
+  (#1209008).
+
 * Thu Jul 02 2015 Florian Müllner <fmuellner@redhat.com> - 3.16.3-1
 - Update to 3.16.3
 
