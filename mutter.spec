@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.17.90
-Release:       2%{?dist}
+Version:       3.17.91
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -168,6 +168,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Sep 03 2015 Florian Müllner <fmuellner@redhat.com> - 3.17.91-1
+- Update to 3.17.91
+
 * Thu Sep 03 2015 Ray Strode <rstrode@redhat.com> 3.17.90-2
 - Add workaround for qxl cursor visibility wonkiness that we
   did for f22
