@@ -2,7 +2,7 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.17.92
+Version:       3.18.0
 Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
@@ -10,11 +10,10 @@ Group:         User Interface/Desktops
 License:       GPLv2+
 #VCS:          git:git://git.gnome.org/mutter
 URL:           http://www.gnome.org
-Source0:       http://download.gnome.org/sources/%{name}/3.17/%{name}-%{version}.tar.xz
+Source0:       http://download.gnome.org/sources/%{name}/3.18/%{name}-%{version}.tar.xz
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
-Patch1: 0001-launcher-Don-t-pass-variable-as-format-string.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -99,7 +98,6 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1 -b .fix-cursor
-%patch1 -p1 -b fix-compiler-warning
 
 %build
 autoreconf -f -i
@@ -170,6 +168,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Mon Sep 21 2015 Florian Müllner <fmuellner@redhat.com> - 3.18.0-1
+- Update to 3.18.0
+
 * Wed Sep 16 2015 Florian Müllner <fmuellner@redhat.com> - 3.17.92-1
 - Update to 3.17.92
 
