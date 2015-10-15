@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.16.3
-Release:       3%{?dist}
+Version:       3.16.4
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -15,13 +15,6 @@ Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
 Patch1:        0001-input-settings-x11-check-properties-for-correctness-.patch
-Patch2:        0001-frames-handle-META_FRAME_CONTROL_NONE-on-left-click.patch
-
-# https://bugzilla.gnome.org/show_bug.cgi?id=728464
-Patch3:        0001-compositor-Add-support-for-GL_EXT_x11_sync_object.patch
-Patch4:        0002-compositor-Fix-GL_EXT_x11_sync_object-race-condition.patch
-Patch5:        0003-build-Fix-return-value-in-meta-sync-ring.c.patch
-Patch6:        0004-compositor-Handle-fences-in-the-frontend-X-connectio.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -107,11 +100,6 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1 -b .fix-cursor
 %patch1 -p1 -b .property-correctnes
-%patch2 -p1 -b .meta-frame-control-none
-%patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
 
 %build
 autoreconf -f -i
@@ -182,6 +170,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Oct 15 2015 Florian Müllner <fmuellner@redhat.com> - 3.16.4-1
+- Update to 3.16.4
+
 * Fri Aug 21 2015 Kalev Lember <klember@redhat.com> - 3.16.3-3
 - Backport patches to fix flickering with Nvidia drivers (bgo#728464)
 
