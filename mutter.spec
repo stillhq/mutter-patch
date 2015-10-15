@@ -14,7 +14,6 @@ Source0:       http://download.gnome.org/sources/%{name}/3.16/%{name}-%{version}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
-Patch1:        0001-input-settings-x11-check-properties-for-correctness-.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -99,7 +98,6 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1 -b .fix-cursor
-%patch1 -p1 -b .property-correctnes
 
 %build
 autoreconf -f -i
