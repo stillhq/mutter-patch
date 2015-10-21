@@ -1,4 +1,4 @@
-From 005ca30d158a711cedd2815b26b2798d3e715b49 Mon Sep 17 00:00:00 2001
+From 3606227c07773c819d99fa8c135215a4a175d5f0 Mon Sep 17 00:00:00 2001
 From: Ray Strode <rstrode@redhat.com>
 Date: Mon, 11 May 2015 16:53:41 -0400
 Subject: [PATCH] Force cursor update after applying configuration
@@ -18,7 +18,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=746078
  2 files changed, 75 insertions(+)
 
 diff --git a/src/backends/native/meta-launcher.c b/src/backends/native/meta-launcher.c
-index 618bd68..6d839df 100644
+index d7da9e8..013f40e 100644
 --- a/src/backends/native/meta-launcher.c
 +++ b/src/backends/native/meta-launcher.c
 @@ -83,85 +83,122 @@ get_session_proxy (GCancellable *cancellable)
@@ -57,7 +57,7 @@ index 618bd68..6d839df 100644
 +                CoglFrameInfo *frame_info,
 +                void          *user_data)
 +{
-+  static CoglFrameClosure **frame_closure = user_data;
++  CoglFrameClosure **frame_closure = user_data;
 +
 +  MetaBackend *backend = meta_get_backend ();
 +  MetaCursorRenderer *renderer = meta_backend_get_cursor_renderer (backend);
@@ -78,12 +78,12 @@ index 618bd68..6d839df 100644
 +static void
  session_unpause (void)
  {
-   ClutterBackend *backend;
+   ClutterBackend *clutter_backend;
    CoglContext *cogl_context;
    CoglDisplay *cogl_display;
  
-   backend = clutter_get_default_backend ();
-   cogl_context = clutter_backend_get_cogl_context (backend);
+   clutter_backend = clutter_get_default_backend ();
+   cogl_context = clutter_backend_get_cogl_context (clutter_backend);
    cogl_display = cogl_context_get_display (cogl_context);
    cogl_kms_display_queue_modes_reset (cogl_display);
  
@@ -111,8 +111,8 @@ index 618bd68..6d839df 100644
 +
 +    frame_closure = cogl_onscreen_add_frame_callback (cogl_onscreen,
 +                                                      frame_callback,
-+                                                      manager,
-+                                                      &frame_closure);
++                                                      &frame_closure,
++                                                      NULL);
 +
      meta_idle_monitor_native_reset_idletime (meta_idle_monitor_get_core ());
    }
