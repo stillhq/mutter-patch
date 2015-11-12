@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.18.1
-Release:       4%{?dist}
+Version:       3.18.2
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -171,6 +171,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Nov 12 2015 Florian Müllner <fmuellner@redhat.com> - 3.18.2-1
+- Update to 3.18.2
+
 * Wed Oct 21 2015 Ray Strode <rstrode@redhat.com> 3.18.1-4
 - Force the cursor visible on vt switches after setting
   the crtc to workaround that qxl bug from before in a
