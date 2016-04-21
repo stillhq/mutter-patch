@@ -2,8 +2,8 @@
 %global gsettings_desktop_schemas_version 3.15.92
 
 Name:          mutter
-Version:       3.18.3
-Release:       2%{?dist}
+Version:       3.18.4
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -16,7 +16,6 @@ Source0:       http://download.gnome.org/sources/%{name}/3.18/%{name}-%{version}
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
 # Backported from upstream
 Patch1:        0001-wayland-surface-disconnect-signals-on-destroy.patch
-Patch2:        0001-Handle-meta_screen_get_monitor_for_point-returning-N.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -102,7 +101,6 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1 -b .fix-cursor
 %patch1 -p1
-%patch2 -p1
 
 %build
 autoreconf -f -i
@@ -173,6 +171,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Apr 21 2016 Florian Müllner <fmuellner@redhat.com> - 3.18.4-1
+- Update to 3.18.4
+
 * Thu Mar 10 2016 Florian Müllner <fmuellner@redhat.com> - 3.18.3-2
 - Include upstream fix for disappearing mouse pointer on X11
 
