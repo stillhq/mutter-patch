@@ -3,7 +3,7 @@
 %global clutter_version 1.25.6
 
 Name:          mutter
-Version:       3.20.1
+Version:       3.20.2
 Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
@@ -57,7 +57,7 @@ Obsoletes: mutter-wayland-devel < 3.13.0
 
 # Make sure yum updates gnome-shell as well; otherwise we might end up with
 # broken gnome-shell installations due to mutter ABI changes.
-Conflicts: gnome-shell < 3.18.0
+Conflicts: gnome-shell < 3.20.2
 
 Requires: clutter%{?_isa} >= %{clutter_version}
 Requires: control-center-filesystem
@@ -170,6 +170,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Tue May 10 2016 Florian Müllner <fmuellner@redhat.com> - 3.20.2-1
+- Update to 3.20.2
+
 * Wed Apr 13 2016 Florian Müllner <fmuellner@redhat.com> - 3.20.1-1
 - Update to 3.20.1
 
