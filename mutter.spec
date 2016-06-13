@@ -4,7 +4,7 @@
 
 Name:          mutter
 Version:       3.20.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -15,6 +15,9 @@ Source0:       http://download.gnome.org/sources/%{name}/3.20/%{name}-%{version}
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=1200901
 Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=1331382
+Patch1:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
@@ -100,6 +103,7 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1 -b .fix-cursor
+%patch1 -p1 -b .revert-xkb-lock-group
 
 %build
 autoreconf -f -i
@@ -170,6 +174,12 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Mon Jun 13 2016 Rui Matos <rmatos@redhat.com> - 3.20.2-2
+- Revert an upstream patch which made us override 3rd parties changing
+  the XKB group index causing Anaconda's keyboard layout switcher to
+  stop working
+  Related: #1331382
+
 * Tue May 10 2016 Florian Müllner <fmuellner@redhat.com> - 3.20.2-1
 - Update to 3.20.2
 
