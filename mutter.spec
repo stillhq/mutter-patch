@@ -3,8 +3,8 @@
 %global clutter_version 1.25.6
 
 Name:          mutter
-Version:       3.20.2
-Release:       2%{?dist}
+Version:       3.20.3
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -174,6 +174,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Jun 29 2016 Florian Müllner <fmuellner@redhat.com> - 3.20.3-1
+- Update to 3.20.3
+
 * Mon Jun 13 2016 Rui Matos <rmatos@redhat.com> - 3.20.2-2
 - Revert an upstream patch which made us override 3rd parties changing
   the XKB group index causing Anaconda's keyboard layout switcher to
