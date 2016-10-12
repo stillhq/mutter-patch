@@ -4,7 +4,7 @@
 
 Name:          mutter
 Version:       3.20.3
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 Group:         User Interface/Desktops
@@ -178,7 +178,7 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
-* Wed Oct 12 2016 Ray Strode <rstrode@redhat.com> - 3.20.3-1
+* Wed Oct 12 2016 Ray Strode <rstrode@redhat.com> - 3.20.3-2
 - Fix user switching crash
   GNOME Upstream: #770727
 
