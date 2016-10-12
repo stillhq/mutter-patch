@@ -1,0 +1,158 @@
+From f37b21e923311ed0d119cb302da2ae3fae4a322c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Fri, 2 Sep 2016 11:50:29 +0800
+Subject: [PATCH] wayland: Don't handle input events after capability was
+ removed
+
+The seat capability updating is synchronous, but input events are
+asynchronous (first queued then emitted). This means we may end up in a
+situation where we from libinput first may receive a key event,
+immediately followed by a device-removed event. Clutter will first
+queue the key event, then remove the device, immediately triggering the
+seat capability removal.
+
+Later, when the clutter stage processes the queued events, the
+previously queued key event will be processed, eventually making it
+into MetaWaylandSeat. Before this patch, MetaWaylandSeat would still
+forward the key event to MetaWaylandKeyboard, even though it had
+'released' it. Doing this would cause referencing potentially freed
+memory, such as the xkb state that was unreferenced when the seat
+removed the capability.
+
+In order to avoid processing these lingering events, for now, just drop
+them on the floor if the capability has been removed.
+
+Eventually, the event queuing etc needs to be redesigned to work better
+when used in a Wayland compositor, but for now at least don't access
+freed memory.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=770727
+---
+ src/wayland/meta-wayland-seat.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-seat.c b/src/wayland/meta-wayland-seat.c
+index 367c1f1..af42cfb 100644
+--- a/src/wayland/meta-wayland-seat.c
++++ b/src/wayland/meta-wayland-seat.c
+@@ -273,104 +273,110 @@ event_from_supported_hardware_device (MetaWaylandSeat    *seat,
+     {
+     case CLUTTER_TOUCHPAD_DEVICE:
+     case CLUTTER_POINTER_DEVICE:
+     case CLUTTER_KEYBOARD_DEVICE:
+     case CLUTTER_TOUCHSCREEN_DEVICE:
+       supported_device = TRUE;
+       break;
+ 
+     default:
+       supported_device = FALSE;
+       break;
+     }
+ 
+ out:
+   return hardware_device && supported_device;
+ }
+ 
+ void
+ meta_wayland_seat_update (MetaWaylandSeat    *seat,
+                           const ClutterEvent *event)
+ {
+   if (!event_from_supported_hardware_device (seat, event))
+     return;
+ 
+   switch (event->type)
+     {
+     case CLUTTER_MOTION:
+     case CLUTTER_BUTTON_PRESS:
+     case CLUTTER_BUTTON_RELEASE:
+     case CLUTTER_SCROLL:
+-      meta_wayland_pointer_update (&seat->pointer, event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_POINTER)
++        meta_wayland_pointer_update (&seat->pointer, event);
+       break;
+ 
+     case CLUTTER_KEY_PRESS:
+     case CLUTTER_KEY_RELEASE:
+-      meta_wayland_keyboard_update (&seat->keyboard, (const ClutterKeyEvent *) event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
++        meta_wayland_keyboard_update (&seat->keyboard, (const ClutterKeyEvent *) event);
+       break;
+ 
+     case CLUTTER_TOUCH_BEGIN:
+     case CLUTTER_TOUCH_UPDATE:
+     case CLUTTER_TOUCH_END:
+-      meta_wayland_touch_update (&seat->touch, event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_TOUCH)
++        meta_wayland_touch_update (&seat->touch, event);
+       break;
+ 
+     default:
+       break;
+     }
+ }
+ 
+ gboolean
+ meta_wayland_seat_handle_event (MetaWaylandSeat *seat,
+                                 const ClutterEvent *event)
+ {
+   if (!event_from_supported_hardware_device (seat, event))
+     return FALSE;
+ 
+   switch (event->type)
+     {
+     case CLUTTER_MOTION:
+     case CLUTTER_BUTTON_PRESS:
+     case CLUTTER_BUTTON_RELEASE:
+     case CLUTTER_SCROLL:
+     case CLUTTER_TOUCHPAD_SWIPE:
+     case CLUTTER_TOUCHPAD_PINCH:
+-      return meta_wayland_pointer_handle_event (&seat->pointer, event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_POINTER)
++        return meta_wayland_pointer_handle_event (&seat->pointer, event);
+ 
+     case CLUTTER_KEY_PRESS:
+     case CLUTTER_KEY_RELEASE:
+-      return meta_wayland_keyboard_handle_event (&seat->keyboard,
+-                                                 (const ClutterKeyEvent *) event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
++        return meta_wayland_keyboard_handle_event (&seat->keyboard,
++                                                   (const ClutterKeyEvent *) event);
+     case CLUTTER_TOUCH_BEGIN:
+     case CLUTTER_TOUCH_UPDATE:
+     case CLUTTER_TOUCH_END:
+-      return meta_wayland_touch_handle_event (&seat->touch, event);
++      if (seat->capabilities & WL_SEAT_CAPABILITY_TOUCH)
++        return meta_wayland_touch_handle_event (&seat->touch, event);
+ 
+     default:
+       break;
+     }
+ 
+   return FALSE;
+ }
+ 
+ void
+ meta_wayland_seat_repick (MetaWaylandSeat *seat)
+ {
+   if ((seat->capabilities & WL_SEAT_CAPABILITY_POINTER) == 0)
+     return;
+ 
+   meta_wayland_pointer_repick (&seat->pointer);
+ }
+ 
+ void
+ meta_wayland_seat_set_input_focus (MetaWaylandSeat    *seat,
+                                    MetaWaylandSurface *surface)
+ {
+   if ((seat->capabilities & WL_SEAT_CAPABILITY_KEYBOARD) == 0)
+     return;
+ 
+   meta_wayland_keyboard_set_focus (&seat->keyboard, surface);
+   meta_wayland_data_device_set_keyboard_focus (&seat->data_device);
+ }
+ 
+ gboolean
+ meta_wayland_seat_get_grab_info (MetaWaylandSeat    *seat,
+-- 
+2.7.4
+

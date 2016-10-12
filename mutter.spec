@@ -19,6 +19,9 @@ Patch0:        0001-Force-cursor-update-after-applying-configuration.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1331382
 Patch1:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 
+# https://bugzilla.gnome.org/show_bug.cgi?id=770727
+Patch2:        0001-wayland-Don-t-handle-input-events-after-capability-w.patch
+
 BuildRequires: clutter-devel >= %{clutter_version}
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -104,6 +107,7 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1 -b .fix-cursor
 %patch1 -p1 -b .revert-xkb-lock-group
+%patch2 -p1 -b .fix-user-switch-crash
 
 %build
 autoreconf -f -i
@@ -174,6 +178,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Oct 12 2016 Ray Strode <rstrode@redhat.com> - 3.20.3-1
+- Fix user switching crash
+  GNOME Upstream: #770727
+
 * Wed Jun 29 2016 Florian Müllner <fmuellner@redhat.com> - 3.20.3-1
 - Update to 3.20.3
 
