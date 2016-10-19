@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.1
-Release:       3%{?dist}
+Release:       4%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -17,6 +17,8 @@ Source0:       http://download.gnome.org/sources/%{name}/3.22/%{name}-%{version}
 Patch0:        0001-Use-eglGetPlatformDisplay.patch
 # Backported from upstream
 Patch1:        0001-clutter-stage-Fix-framebuffer-capture-origin-offset-.patch
+# https://bugzilla.gnome.org/show_bug.cgi?id=771442
+Patch2:        fall-back-to-xorg-on-hybrid-gpus.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -110,6 +112,7 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 autoreconf -f -i
@@ -184,6 +187,11 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Oct 19 2016 Ray Strode <rstrode@redhat.com> - 3.22.1-4
+- Force xorg fallback on systems with outputs spread
+  across multiple machines.
+  Resolves: #1375247
+
 * Tue Oct 18 2016 Kalev Lember <klember@redhat.com> - 3.22.1-3
 - Backport a fix to make gnome-screenshot --area work
 
