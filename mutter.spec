@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -16,7 +16,7 @@ Source0:       http://download.gnome.org/sources/%{name}/3.22/%{name}-%{version}
 # https://bugzilla.gnome.org/show_bug.cgi?id=772422
 Patch0:        0001-Use-eglGetPlatformDisplay.patch
 # Backported from upstream
-Patch1:        0001-clutter-stage-Fix-framebuffer-capture-origin-offset-.patch
+Patch1:        gnome-3-22-e8fc090.patch
 # https://bugzilla.gnome.org/show_bug.cgi?id=771442
 Patch2:        fall-back-to-xorg-on-hybrid-gpus.patch
 
@@ -187,6 +187,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Oct 20 2016 Rui Matos <rmatos@redhat.com> - 3.22.1-5
+- Update to upstream gnome-3-22 commit e8fc090 for multiple fixes
+  Resolves: #1379098
+
 * Wed Oct 19 2016 Ray Strode <rstrode@redhat.com> - 3.22.1-4
 - Force xorg fallback on systems with outputs spread
   across multiple machines.
