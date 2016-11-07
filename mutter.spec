@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.1
-Release:       6%{?dist}
+Release:       7%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -21,6 +21,8 @@ Patch1:        gnome-3-22-e8fc090.patch
 Patch2:        fall-back-to-xorg-on-hybrid-gpus.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1331382
 Patch3:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=1390607
+Patch4:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -116,6 +118,7 @@ the functionality of the installed %{name} package.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 autoreconf -f -i
@@ -190,6 +193,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Mon Nov  7 2016 Rui Matos <rmatos@redhat.com> - 3.22.1-7
+- Add upstream fix for mutter side of rhbz#1390607
+  Resolves: #1390607
+
 * Mon Oct 31 2016 Rui Matos <rmatos@redhat.com> - 3.22.1-6
 - Revert an upstream patch which made us override 3rd parties changing
   the XKB group index causing Anaconda's keyboard layout switcher to
