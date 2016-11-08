@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.1
-Release:       7%{?dist}
+Release:       8%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -23,6 +23,8 @@ Patch2:        fall-back-to-xorg-on-hybrid-gpus.patch
 Patch3:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1390607
 Patch4:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
+
+Patch5:         startup-notification.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -119,6 +121,7 @@ the functionality of the installed %{name} package.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
 autoreconf -f -i
@@ -193,6 +196,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Tue Nov  8 2016 Matthias Clasen <mclasen@redhat.com> 0 3.22.1-8
+- Add upstream patch for mutter size of rhbz#1376471
+
 * Mon Nov  7 2016 Rui Matos <rmatos@redhat.com> - 3.22.1-7
 - Add upstream fix for mutter side of rhbz#1390607
   Resolves: #1390607
