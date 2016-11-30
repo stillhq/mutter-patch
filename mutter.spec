@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -23,6 +23,7 @@ Patch3:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 Patch4:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
 
 Patch5:         startup-notification.patch
+Patch6:         gnome-3-22-a943c0f.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -119,6 +120,7 @@ the functionality of the installed %{name} package.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 %build
 autoreconf -f -i
@@ -193,6 +195,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Nov 30 2016 Rui Matos <rmatos@redhat.com> - 3.22.2-2
+- Update to upstream gnome-3-22 commit a943c0f for multiple fixes
+  Resolves: #1401893
+
 * Thu Nov 10 2016 Florian Müllner <fmuellner@redhat.com> - 3.22.2-1
 - Update to 3.22.2
 
