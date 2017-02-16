@@ -4,8 +4,8 @@
 %global libinput_version 1.4
 
 Name:          mutter
-Version:       3.22.2
-Release:       3%{?dist}
+Version:       3.22.3
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -13,18 +13,14 @@ License:       GPLv2+
 URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.22/%{name}-%{version}.tar.xz
 
-# https://bugzilla.gnome.org/show_bug.cgi?id=772422
-Patch0:        0001-Use-eglGetPlatformDisplay.patch
 # https://bugzilla.gnome.org/show_bug.cgi?id=771442
-Patch2:        fall-back-to-xorg-on-hybrid-gpus.patch
+Patch0:        fall-back-to-xorg-on-hybrid-gpus.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1331382
-Patch3:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
+Patch1:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1390607
-Patch4:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
+Patch2:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
 
-Patch5:         startup-notification.patch
-Patch6:         gnome-3-22-a943c0f.patch
-Patch7:         0001-MetaRendererNative-Flush-all-pending-swap-notifies-o.patch
+Patch3:         startup-notification.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -117,12 +113,9 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
 
 %build
 autoreconf -f -i
@@ -195,6 +188,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Thu Feb 16 2017 Florian Müllner <fmuellner@redhat.com> - 3.22.3-1
+- Update to 3.22.3
+
 * Wed Dec  7 2016 Rui Matos <rmatos@redhat.com> - 3.22.2-3
 - Add upstream fix for wayland session hang on multi-monitor setups
   Resolves: #1402307
