@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.22.4
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -20,7 +20,9 @@ Patch1:        0001-Revert-backend-x11-Ensure-the-Xkb-group-index-remain.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1390607
 Patch2:        0001-wayland-xdg-shell-Handle-the-wl_output-on-the-set_fu.patch
 
-Patch3:         startup-notification.patch
+Patch3:        startup-notification.patch
+
+Patch4:        0001-wayland-subsurface-Handle-clients-committing-on-dest.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -116,6 +118,7 @@ the functionality of the installed %{name} package.
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 autoreconf -f -i
@@ -188,6 +191,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Fri May 05 2017 Florian Müllner <fmuellner@redhat.com> - 3.22.4-2
+- Backport fix for buggy wayland clients crashing the session
+
 * Tue Apr 11 2017 Florian Müllner <fmuellner@redhat.com> - 3.22.4-1
 - Update to 3.22.4
 
