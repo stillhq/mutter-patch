@@ -16,6 +16,7 @@ Source0:       http://download.gnome.org/sources/%{name}/3.24/%{name}-%{version}
 Patch0:        startup-notification.patch
 
 Patch1:        0001-wayland-outputs-Delay-wl_output-destruction.patch
+Patch2:        0001-build-Require-libgudev-232.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -113,6 +114,7 @@ the functionality of the installed %{name} package.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 autoreconf -f -i
