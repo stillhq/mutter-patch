@@ -1,0 +1,65 @@
+From 1de559df22a90fe5dfd8bbad0015f3ee3e8130da Mon Sep 17 00:00:00 2001
+From: Rui Matos <tiagomatos@gmail.com>
+Date: Wed, 6 Dec 2017 17:05:02 +0100
+Subject: [PATCH] wayland-outputs: Delay wl_output destruction
+
+This tries to avoid wayland clients getting disconnected for binding
+to a wl_output that we already destroyed which is a known protocol
+race condition, see https://phabricator.freedesktop.org/T7722 .
+
+https://bugzilla.gnome.org/show_bug.cgi?id=789070
+---
+ src/wayland/meta-wayland-outputs.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/wayland/meta-wayland-outputs.c b/src/wayland/meta-wayland-outputs.c
+index c6b8e5538..67d90250c 100644
+--- a/src/wayland/meta-wayland-outputs.c
++++ b/src/wayland/meta-wayland-outputs.c
+@@ -235,6 +235,9 @@ bind_output (struct wl_client *client,
+   wl_resource_set_user_data (resource, wayland_output);
+   wl_resource_set_destructor (resource, output_resource_destroy);
+ 
++  if (!logical_monitor)
++    return;
++
+   monitor = pick_main_monitor (logical_monitor);
+ 
+   meta_verbose ("Binding monitor %p/%s (%u, %u, %u, %u) x %f\n",
+@@ -310,6 +313,22 @@ meta_wayland_output_new (MetaWaylandCompositor *compositor,
+   return wayland_output;
+ }
+ 
++static void
++nullify_logical_monitor (gpointer key,
++                         gpointer value,
++                         gpointer data)
++{
++  MetaWaylandOutput *wayland_output = value;
++  wayland_output->logical_monitor = NULL;
++}
++
++static gboolean
++delayed_destroy_outputs (gpointer data)
++{
++  g_hash_table_destroy (data);
++  return G_SOURCE_REMOVE;
++}
++
+ static GHashTable *
+ meta_wayland_compositor_update_outputs (MetaWaylandCompositor *compositor,
+                                         MetaMonitorManager    *monitor_manager)
+@@ -350,7 +369,9 @@ meta_wayland_compositor_update_outputs (MetaWaylandCompositor *compositor,
+                            wayland_output);
+     }
+ 
+-  g_hash_table_destroy (compositor->outputs);
++  g_hash_table_foreach (compositor->outputs, nullify_logical_monitor, NULL);
++  g_timeout_add_seconds (10, delayed_destroy_outputs, compositor->outputs);
++
+   return new_table;
+ }
+ 
+-- 
+2.14.2
+

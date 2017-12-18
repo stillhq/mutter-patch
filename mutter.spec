@@ -5,7 +5,7 @@
 
 Name:          mutter
 Version:       3.24.4
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -14,6 +14,8 @@ URL:           http://www.gnome.org
 Source0:       http://download.gnome.org/sources/%{name}/3.24/%{name}-%{version}.tar.xz
 
 Patch0:        startup-notification.patch
+
+Patch1:        0001-wayland-outputs-Delay-wl_output-destruction.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -110,6 +112,7 @@ the functionality of the installed %{name} package.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 autoreconf -f -i
@@ -182,6 +185,10 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Mon Dec 18 2017 Rui Matos <rmatos@redhat.com> - 3.24.4-3
+- Add upstream patch to avoid a crash on wayland sessions
+  Resolves: #1514220
+
 * Wed Sep 20 2017 Florian Müllner <fmuellner@redhat.com> - 3.24.4-2
 - Enable tablet support
 
