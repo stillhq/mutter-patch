@@ -1,7 +1,7 @@
 From cac1fea4dedb9a6bedb9903cd6551c910b57ee05 Mon Sep 17 00:00:00 2001
 From: Kjartan Maraas <kmaraas@gnome.org>
 Date: Mon, 6 Nov 2017 13:42:41 +0100
-Subject: [PATCH 01/34] =?UTF-8?q?Updated=20Norwegian=20bokm=C3=A5l=20trans?=
+Subject: [PATCH 01/50] =?UTF-8?q?Updated=20Norwegian=20bokm=C3=A5l=20trans?=
  =?UTF-8?q?lation.?=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -31,13 +31,13 @@ index 786878e9d..cb7db385f 100644
  "Language-Team: Norwegian bokmål <i18n-no@lister.ping.uio.no>\n"
  "Language: nb\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 0cd07cd8641ca74c9311994f30b8dba7799848bb Mon Sep 17 00:00:00 2001
 From: Marc-Antoine Perennou <Marc-Antoine@Perennou.com>
 Date: Mon, 6 Nov 2017 10:54:59 +0100
-Subject: [PATCH 02/34] build-sys: allow explicitely disabling remote-desktop
+Subject: [PATCH 02/50] build-sys: allow explicitely disabling remote-desktop
  and egl-device
 
 https://bugzilla.gnome.org/show_bug.cgi?id=789958
@@ -72,13 +72,13 @@ index fb53d6d48..ab917b245 100644
  )
  AS_IF([test "$enable_egl_device" = "yes"], [
 -- 
-2.14.2
+2.17.0
 
 
 From cc311dc8e68698a25c05d6020a13a8af44e14799 Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Mon, 6 Nov 2017 20:35:13 +0100
-Subject: [PATCH 03/34] compositor: Keep reference to the screen on the
+Subject: [PATCH 03/50] compositor: Keep reference to the screen on the
  MetaBackground
 
 This is not a leak per se, but it seems too easy to make valgrind
@@ -105,13 +105,13 @@ index 00d18f1fd..61dd12095 100644
    if (priv->screen != NULL)
      {
 -- 
-2.14.2
+2.17.0
 
 
 From 3db950b307894453a8da35e43d1646938a2b753e Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Mon, 6 Nov 2017 20:34:21 +0100
-Subject: [PATCH 04/34] clutter: Plug evdev ClutterDeviceManager leaks
+Subject: [PATCH 04/50] clutter: Plug evdev ClutterDeviceManager leaks
 
 The unused ID GList element is leaked, and so is the node path.
 
@@ -147,13 +147,13 @@ index cb4340a8f..5328c56d3 100644
    if (libinput_device_get_size (libinput_device, &width, &height) == 0)
      device->device_aspect_ratio = width / height;
 -- 
-2.14.2
+2.17.0
 
 
 From 0b10df1faadac9a5d19d9220cecda03c2eccc2eb Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Mon, 6 Nov 2017 20:37:34 +0100
-Subject: [PATCH 05/34] wayland: Plug leak
+Subject: [PATCH 05/50] wayland: Plug leak
 
 The remote DBus error is leaked.
 
@@ -182,13 +182,13 @@ index 2c3dff281..799613c89 100644
      }
  }
 -- 
-2.14.2
+2.17.0
 
 
 From 2882ddec7b482bf65726c42350a5cf70f543860c Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Mon, 6 Nov 2017 20:38:43 +0100
-Subject: [PATCH 06/34] core: Plug leaks
+Subject: [PATCH 06/50] core: Plug leaks
 
 The MetaWorkspaceLogicalMonitorData structs are leaked, and so is the
 stamps hashtable in MetaDisplay.
@@ -224,13 +224,13 @@ index 901de4541..7866c15d3 100644
  
  static MetaWorkspaceLogicalMonitorData *
 -- 
-2.14.2
+2.17.0
 
 
 From 8d7f425de41efc9d643df06ba3f03a4e6fc2a115 Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Tue, 7 Nov 2017 10:59:51 +0100
-Subject: [PATCH 07/34] backends: Plug leaks
+Subject: [PATCH 07/50] backends: Plug leaks
 
 The DRM properties container must be destroyed with
 drmModeFreeObjectProperties.
@@ -254,13 +254,13 @@ index 3b23625f2..cbd5209c2 100644
  
  static drmModePropertyBlobPtr
 -- 
-2.14.2
+2.17.0
 
 
 From 74e88dd18f2d66d8ab861dacfab3e1ba07065ac5 Mon Sep 17 00:00:00 2001
 From: Benoit Gschwind <gschwind@gnu-log.net>
 Date: Wed, 25 Oct 2017 22:13:30 +0200
-Subject: [PATCH 08/34] backend: Reset current device id when current device
+Subject: [PATCH 08/50] backend: Reset current device id when current device
  removed
 
 Bluetooth mouse usually goes in sleep state after a timeout, when that
@@ -296,13 +296,13 @@ index c856823e2..798dc5ffd 100644
        has_touchscreen = check_has_slave_touchscreen (device_manager);
  
 -- 
-2.14.2
+2.17.0
 
 
 From ce7dbfb3d9604dab268ac163601e66ff731ff42f Mon Sep 17 00:00:00 2001
 From: memeka <mihailescu2m@gmail.com>
 Date: Fri, 3 Nov 2017 03:59:00 +0000
-Subject: [PATCH 09/34] renderer/native: Also allow EGL_KHR_platform_gbm
+Subject: [PATCH 09/50] renderer/native: Also allow EGL_KHR_platform_gbm
  extension string
 
 Proprietary drivers such as ARM Mali export EGL_KHR_platform_gbm instead
@@ -329,13 +329,13 @@ index 4d1d8902f..2756e9952 100644
      {
        g_set_error (error, G_IO_ERROR,
 -- 
-2.14.2
+2.17.0
 
 
 From 3572502a736f7b5d96fcd80889168311952b1ebb Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
 Date: Mon, 16 Oct 2017 17:02:51 +0800
-Subject: [PATCH 10/34] window/wayland: Handle resizing when headless
+Subject: [PATCH 10/50] window/wayland: Handle resizing when headless
 
 We tried to get the geometry scale, which may depend on the main
 logical monitor assigned to the window. To avoid dereferencing a NULL
@@ -380,13 +380,13 @@ index ed6e34b43..f3f0e1688 100644
  }
  
 -- 
-2.14.2
+2.17.0
 
 
 From 1d882886ba0eddbb1a067535883f3db499b89ced Mon Sep 17 00:00:00 2001
 From: Olivier Fourdan <ofourdan@redhat.com>
 Date: Fri, 10 Nov 2017 09:15:15 +0100
-Subject: [PATCH 11/34] wayland: Use Super+Escape to re-enable shortcuts
+Subject: [PATCH 11/50] wayland: Use Super+Escape to re-enable shortcuts
 
 Change the default key combo to re-enable normal keyboard shortcuts
 processing while a shortcut inhibitor is in effect to Super+Escape as
@@ -413,13 +413,13 @@ index e8ee1cca7..f85e7b7ab 100644
      </key>
    </schema>
 -- 
-2.14.2
+2.17.0
 
 
 From cc49f6ef784f3eeb20dc8ab907df1e5c5a6901d3 Mon Sep 17 00:00:00 2001
 From: Olivier Fourdan <ofourdan@redhat.com>
 Date: Fri, 10 Nov 2017 09:40:51 +0100
-Subject: [PATCH 12/34] Add restore-shortcuts to key bindings list
+Subject: [PATCH 12/50] Add restore-shortcuts to key bindings list
 
 gnome-control-center uses this to list the keybindings, without this
 users cannot change the default key combo to restore shortcuts.
@@ -464,13 +464,13 @@ index 86260e949..5129b8e57 100644
  	org.gnome.mutter.gschema.xml.in	\
  	org.gnome.mutter.wayland.gschema.xml.in
 -- 
-2.14.2
+2.17.0
 
 
 From 7f3da7511ad58d0d28168bda7744f1e6dba25436 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Piotr=20Dr=C4=85g?= <piotrdrag@gmail.com>
 Date: Fri, 10 Nov 2017 19:16:27 +0100
-Subject: [PATCH 13/34] Update POTFILES.in
+Subject: [PATCH 13/50] Update POTFILES.in
 
 ---
  po/POTFILES.in | 1 +
@@ -489,13 +489,13 @@ index b8023350a..50718bce9 100644
  data/mutter.desktop.in
  data/org.gnome.mutter.gschema.xml.in
 -- 
-2.14.2
+2.17.0
 
 
 From b86e0f0fd4b16d6779e158d1cde2cfec4d358d08 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Piotr=20Dr=C4=85g?= <piotrdrag@gmail.com>
 Date: Fri, 10 Nov 2017 19:30:41 +0100
-Subject: [PATCH 14/34] Update Polish translation
+Subject: [PATCH 14/50] Update Polish translation
 
 ---
  po/pl.po | 32 ++++++++++++++++++--------------
@@ -612,13 +612,13 @@ index b0c5824b2..18562968d 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Podekran %d ekranu „%s” jest nieprawidłowy\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 19cde75acccb91cdc2945b6ed50d1ba495240a3a Mon Sep 17 00:00:00 2001
 From: Rafael Fontenelle <rafaelff@gnome.org>
 Date: Sat, 11 Nov 2017 18:56:59 +0000
-Subject: [PATCH 15/34] Update Brazilian Portuguese translation
+Subject: [PATCH 15/50] Update Brazilian Portuguese translation
 
 ---
  po/pt_BR.po | 29 ++++++++++++++++-------------
@@ -732,13 +732,13 @@ index 2fafb1e3b..e342f0ed3 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "A tela %d na exibição “%s” é inválida\n"
 -- 
-2.14.2
+2.17.0
 
 
 From cdfeecc31822bcba085ef49bd971d1150e64be31 Mon Sep 17 00:00:00 2001
 From: Christian Kirbach <Christian.Kirbach@gmail.com>
 Date: Sat, 11 Nov 2017 21:20:07 +0000
-Subject: [PATCH 16/34] Update German translation
+Subject: [PATCH 16/50] Update German translation
 
 ---
  po/de.po | 32 ++++++++++++++++++--------------
@@ -854,13 +854,13 @@ index 2bcf3e593..584e09046 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Bildschirm %d auf Anzeige »%s« ist ungültig\n"
 -- 
-2.14.2
+2.17.0
 
 
 From f4b4ef32edb26127882fb648eaa129abc915e02c Mon Sep 17 00:00:00 2001
 From: Anders Jonsson <anders.jonsson@norsjovallen.se>
 Date: Mon, 13 Nov 2017 23:44:18 +0000
-Subject: [PATCH 17/34] Update Swedish translation
+Subject: [PATCH 17/50] Update Swedish translation
 
 ---
  po/sv.po | 30 +++++++++++++++++-------------
@@ -974,16 +974,16 @@ index bd50944e5..02ff0b0b2 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Skärm %d på display ”%s” är ogiltig\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 6797be5e1ee21e6afc6c2f1d96a831965a4fb8bb Mon Sep 17 00:00:00 2001
 From: Charles Monzat <superboa@hotmail.fr>
 Date: Tue, 14 Nov 2017 08:11:36 +0000
-Subject: [PATCH 18/34] Update French translation
+Subject: [PATCH 18/50] Update French translation
 
 ---
- po/fr.po | 75 +++++++++++++++++++++++++++-------------------------------------
+ po/fr.po | 75 ++++++++++++++++++++++++--------------------------------
  1 file changed, 32 insertions(+), 43 deletions(-)
 
 diff --git a/po/fr.po b/po/fr.po
@@ -1160,13 +1160,13 @@ index 917149a4a..2bdd43e2c 100644
  msgstr "%s (sur %s)"
 -
 -- 
-2.14.2
+2.17.0
 
 
 From 26ee55a7e4b9fa060c5965fc6e185bd3b8c1e16a Mon Sep 17 00:00:00 2001
 From: Marek Cernocky <marek_cernocky@conel.cz>
 Date: Wed, 15 Nov 2017 13:34:07 +0100
-Subject: [PATCH 19/34] Updated Czech translation
+Subject: [PATCH 19/50] Updated Czech translation
 
 ---
  po/cs.po | 32 ++++++++++++++++++--------------
@@ -1279,13 +1279,13 @@ index bc9690b58..dab3ed59d 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Obrazovka %d na displeji „%s“ je neplatná\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 8c45fbfb581a5bdb8e870cc3f4e591a22538c453 Mon Sep 17 00:00:00 2001
 From: Muhammet Kara <muhammetk@gmail.com>
 Date: Wed, 15 Nov 2017 20:50:19 +0000
-Subject: [PATCH 20/34] Update Turkish translation
+Subject: [PATCH 20/50] Update Turkish translation
 
 ---
  po/tr.po | 46 ++++++++++++++++++----------------------------
@@ -1423,13 +1423,13 @@ index abd857a17..8e2f21b0d 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "“%2$s” monitöründeki %1$d ekranı geçersiz\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 32a151094d08dcdd257ef68a04c096abb6f23757 Mon Sep 17 00:00:00 2001
 From: Milo Casagrande <milo@ubuntu.com>
 Date: Fri, 17 Nov 2017 13:31:09 +0000
-Subject: [PATCH 21/34] Update Italian translation
+Subject: [PATCH 21/50] Update Italian translation
 
 ---
  po/it.po | 30 +++++++++++++++++-------------
@@ -1544,13 +1544,13 @@ index 383df88d0..efd3918ea 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Lo schermo %d sul display «%s» non è valido\n"
 -- 
-2.14.2
+2.17.0
 
 
 From d1e32e170e9a7d7eb7e452ec4f08f9475db2bf48 Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Thu, 16 Nov 2017 17:22:50 +0100
-Subject: [PATCH 22/34] compositor: End MetaDnd grab on plugin grab end
+Subject: [PATCH 22/50] compositor: End MetaDnd grab on plugin grab end
 
 We must emit ::dnd-leave to pair the ::dnd-enter that shall be
 emitted whenever the plugin grab begins, otherwise we leave
@@ -1561,7 +1561,7 @@ https://bugzilla.gnome.org/show_bug.cgi?id=784545
 ---
  src/backends/meta-dnd-private.h |  1 +
  src/compositor/compositor.c     |  5 ++++-
- src/compositor/meta-dnd.c       | 36 ++++++++++++++++++++++++------------
+ src/compositor/meta-dnd.c       | 36 ++++++++++++++++++++++-----------
  3 files changed, 29 insertions(+), 13 deletions(-)
 
 diff --git a/src/backends/meta-dnd-private.h b/src/backends/meta-dnd-private.h
@@ -1647,13 +1647,13 @@ index 2ba69c449..9338553bf 100644
 +}
  #endif
 -- 
-2.14.2
+2.17.0
 
 
 From acab829cc4335f356a7afadeed530a9bbc18e1ad Mon Sep 17 00:00:00 2001
 From: Carlos Garnacho <carlosg@gnome.org>
 Date: Fri, 17 Nov 2017 16:58:54 +0100
-Subject: [PATCH 23/34] compositor: Fix build
+Subject: [PATCH 23/50] compositor: Fix build
 
 Unused variable definition. The fixup didn't make it to the previous
 commit.
@@ -1674,13 +1674,13 @@ index 9338553bf..aae68c216 100644
    MetaDndPrivate *priv = meta_dnd_get_instance_private (dnd);
    unsigned int i;
 -- 
-2.14.2
+2.17.0
 
 
 From d358edd5256c8d89b68443ad509dc795b6ce3efd Mon Sep 17 00:00:00 2001
 From: Daniel van Vugt <daniel.van.vugt@canonical.com>
 Date: Fri, 27 Oct 2017 15:58:19 +0800
-Subject: [PATCH 24/34] eglnative: Use gnome-settings-daemon font settings
+Subject: [PATCH 24/50] eglnative: Use gnome-settings-daemon font settings
 
 While the X11 backend gets its font settings from XSettings, the native
 backend did not use any user font preferences till now. So all shell fonts
@@ -1698,8 +1698,8 @@ No more blurry shell text in Wayland sessions.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=645433
 ---
- clutter/clutter/egl/clutter-backend-eglnative.c | 175 ++++++++++++++++++++++++
- clutter/clutter/egl/clutter-backend-eglnative.h |   3 +
+ .../clutter/egl/clutter-backend-eglnative.c   | 175 ++++++++++++++++++
+ .../clutter/egl/clutter-backend-eglnative.h   |   3 +
  2 files changed, 178 insertions(+)
 
 diff --git a/clutter/clutter/egl/clutter-backend-eglnative.c b/clutter/clutter/egl/clutter-backend-eglnative.c
@@ -1920,13 +1920,13 @@ index d98013d2e..e871c99a0 100644
  
  struct _ClutterBackendEglNativeClass
 -- 
-2.14.2
+2.17.0
 
 
 From ed989a2989fbfe540f3b80f52a0828983ddbc003 Mon Sep 17 00:00:00 2001
 From: Rui Matos <tiagomatos@gmail.com>
 Date: Tue, 14 Nov 2017 18:10:55 +0100
-Subject: [PATCH 25/34] monitor-manager: Refuse to activate closed laptop
+Subject: [PATCH 25/50] monitor-manager: Refuse to activate closed laptop
  panels
 
 There's no good reason to allow this and it allows g-c-c to properly
@@ -1956,13 +1956,13 @@ index f2ad3f3d0..33ef0ef9f 100644
      }
  
 -- 
-2.14.2
+2.17.0
 
 
 From 4f1e63fd0c878f3c22e40d80a9c8224ea4f84030 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Aurimas=20=C4=8Cernius?= <aurisc4@gmail.com>
 Date: Sat, 25 Nov 2017 21:46:16 +0200
-Subject: [PATCH 26/34] Updated Lithuanian translation
+Subject: [PATCH 26/50] Updated Lithuanian translation
 
 ---
  po/lt.po | 40 +++++++++++++++++-----------------------
@@ -2093,16 +2093,16 @@ index b66eeb7ea..47005a567 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Ekranas %d vaizduoklyje „%s“ yra netinkamas\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 789d740add5338bc728619d65b7cfc1063bacf15 Mon Sep 17 00:00:00 2001
 From: Pawan Chitrakar <chautari@gmail.com>
 Date: Sun, 26 Nov 2017 05:19:41 +0000
-Subject: [PATCH 27/34] Update Nepali translation
+Subject: [PATCH 27/50] Update Nepali translation
 
 ---
- po/ne.po | 1822 ++++++++++++++++++++++++++++----------------------------------
+ po/ne.po | 1822 ++++++++++++++++++++++++------------------------------
  1 file changed, 810 insertions(+), 1012 deletions(-)
 
 diff --git a/po/ne.po b/po/ne.po
@@ -4640,13 +4640,13 @@ index b29d0372a..b0b338b70 100644
  #~ msgid ""
  #~ "Window 0x%lx has property %s\n"
 -- 
-2.14.2
+2.17.0
 
 
 From 2e663265ae7dc74a8d823a5bc05ae7f6bf573c17 Mon Sep 17 00:00:00 2001
 From: Kukuh Syafaat <syafaatkukuh@gmail.com>
 Date: Wed, 29 Nov 2017 12:14:07 +0000
-Subject: [PATCH 28/34] Update Indonesian translation
+Subject: [PATCH 28/50] Update Indonesian translation
 
 ---
  po/id.po | 32 ++++++++++++++++++--------------
@@ -4768,13 +4768,13 @@ index d6b286856..9a8ea7eae 100644
  msgid "Screen %d on display “%s” is invalid\n"
  msgstr "Layar %d pada tampilan \"%s\" tidak valid\n"
 -- 
-2.14.2
+2.17.0
 
 
 From ea538537ec2d3d2e58b4a301572de2eac3686c93 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
 Date: Fri, 3 Nov 2017 15:58:02 +0800
-Subject: [PATCH 29/34] monitor-config-manager: Don't include closed laptop
+Subject: [PATCH 29/50] monitor-config-manager: Don't include closed laptop
  panel in config key
 
 When deriving the list of disabled monitors when creating new monitors
@@ -4807,13 +4807,13 @@ index cdc9fb775..63cc1528e 100644
        if (meta_logical_monitor_configs_have_monitor (logical_monitor_configs,
                                                       monitor_spec))
 -- 
-2.14.2
+2.17.0
 
 
 From 205dc28eae33fa8278bf1a32827023c600a79d20 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
 Date: Fri, 3 Nov 2017 16:03:23 +0800
-Subject: [PATCH 30/34] monitor-manager: Compare keys when checking whether a
+Subject: [PATCH 30/50] monitor-manager: Compare keys when checking whether a
  config is complete
 
 We only counted configured monitors and whether the config was
@@ -4836,9 +4836,9 @@ configuration.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=788915
 ---
- src/backends/meta-monitor-config-manager.c |  7 +++---
+ src/backends/meta-monitor-config-manager.c |  7 +++--
  src/backends/meta-monitor-config-manager.h |  2 ++
- src/backends/meta-monitor-manager.c        | 36 +++++++++---------------------
+ src/backends/meta-monitor-manager.c        | 36 ++++++----------------
  3 files changed, 16 insertions(+), 29 deletions(-)
 
 diff --git a/src/backends/meta-monitor-config-manager.c b/src/backends/meta-monitor-config-manager.c
@@ -4930,13 +4930,13 @@ index 33ef0ef9f..e5a5e00bd 100644
  
    return meta_monitor_manager_is_config_applicable (manager, config, NULL);
 -- 
-2.14.2
+2.17.0
 
 
 From bf91e2b4ca1ef8b0478d1edec46bd33065457153 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
 Date: Wed, 29 Nov 2017 18:05:27 -0500
-Subject: [PATCH 31/34] compositor: reset top_window_actor and remove it from
+Subject: [PATCH 31/50] compositor: reset top_window_actor and remove it from
  windows when destroyed
 
 When the top window actor is destroyed, we need to make sure that
@@ -5001,13 +5001,13 @@ index 0eb54fd4e..ff919e6de 100644
  
  void
 -- 
-2.14.2
+2.17.0
 
 
 From 6dd28bd2c7e0ce32fa38b72a49007b9f5fe88272 Mon Sep 17 00:00:00 2001
 From: Benjamin Berg <bberg@redhat.com>
 Date: Wed, 29 Nov 2017 21:23:29 +0100
-Subject: [PATCH 32/34] monitor-manager-kms: poll() on KMS fd on EAGAIN
+Subject: [PATCH 32/50] monitor-manager-kms: poll() on KMS fd on EAGAIN
 
 When drmHandleEvent() returns an error and errno is set to EAGAIN,
 instead of ending up in a busy loop, poll() the fd until there is
@@ -5017,7 +5017,7 @@ This is a simple backport of commit 406359bba1.
 
 https://bugzilla.gnome.org/show_bug.cgi?id=791024
 ---
- src/backends/native/meta-monitor-manager-kms.c | 30 +++++++++++++++++++++++++-
+ .../native/meta-monitor-manager-kms.c         | 30 ++++++++++++++++++-
  1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/src/backends/native/meta-monitor-manager-kms.c b/src/backends/native/meta-monitor-manager-kms.c
@@ -5069,13 +5069,13 @@ index cbd5209c2..32a8aa67c 100644
  
  static gboolean
 -- 
-2.14.2
+2.17.0
 
 
 From ae460046edd80f0262586850f95017b332ba85a5 Mon Sep 17 00:00:00 2001
 From: Benjamin Berg <bberg@redhat.com>
 Date: Thu, 14 Dec 2017 20:38:58 +0100
-Subject: [PATCH 33/34] monitor-manager-kms: Fix recently introduced build
+Subject: [PATCH 33/50] monitor-manager-kms: Fix recently introduced build
  issue
 
 The recent commit 6dd28bd2c7e0c "poll() on KMS fd on EAGAIN" backported
@@ -5104,13 +5104,13 @@ index 32a8aa67c..24d01daaa 100644
            pfd.fd = manager_kms->fd;
            pfd.events = POLL_IN | POLL_ERR;
 -- 
-2.14.2
+2.17.0
 
 
 From cde5454622d99320a66f2fd352df132a4bfdab4b Mon Sep 17 00:00:00 2001
 From: Rui Matos <tiagomatos@gmail.com>
 Date: Wed, 6 Dec 2017 17:05:02 +0100
-Subject: [PATCH 34/34] wayland-outputs: Delay wl_output destruction
+Subject: [PATCH 34/50] wayland-outputs: Delay wl_output destruction
 
 This tries to avoid wayland clients getting disconnected for binding
 to a wl_output that we already destroyed which is a known protocol
@@ -5170,5 +5170,1453 @@ index 51f62f98f..4dfdb18e1 100644
  }
  
 -- 
-2.14.2
+2.17.0
+
+
+From 827d0b3f7f124389899e65df62b61b9c70ba8a7e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Wed, 1 Nov 2017 10:53:59 +0800
+Subject: [PATCH 35/50] keybindings: Only add multiple keycodes from the same
+ level
+
+The reason why multiple keycodes could be mapped to a single keysym was
+to support having both KEY_FAVORITES and KEY_BOOKMARK map to
+XF86Favorites. However, iterating through all layout levels adding all
+key codes has severe consequences on layouts with levels that map
+things like numbers and arrow. The result is that keybindings that
+should only have been added for keycodes from the first level, are
+replaced by some unexpected keycode where the same keysym was found on
+another level.
+
+An example of this is the up-arrow key and l symbol. Normally you'd find
+both the up-arrow symbol and the l symbol on the first level and be done
+with it. However, on the German Neo-2 layout, layout level 4 maps the
+KEY_E to the l symbol, while layout level 4 maps KEY_E to up-arrow.
+Which ever gets to take priority is arbitrary, but for this particular
+case KEY_E incorrectly mapped to up-arrow instead of the l symbol,
+causing the keyboard shortcut Super+l, which would normally lock the
+screen, to trigger the workspace-up (Super+up-arrow) key binding.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=789300
+---
+ src/core/keybindings.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/core/keybindings.c b/src/core/keybindings.c
+index f2ef07697..f2d66d037 100644
+--- a/src/core/keybindings.c
++++ b/src/core/keybindings.c
+@@ -349,7 +349,9 @@ add_keysym_keycodes_from_layout (int                           keysym,
+ {
+   xkb_level_index_t layout_level;
+ 
+-  for (layout_level = 0; layout_level < layout->n_levels; layout_level++)
++  for (layout_level = 0;
++       layout_level < layout->n_levels && keycodes->len == 0;
++       layout_level++)
+     {
+       FindKeysymData search_data = (FindKeysymData) {
+         .keycodes = keycodes,
+-- 
+2.17.0
+
+
+From 7ef3ed0f8234867013e2ecb5d4ba6de493fcea3a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Wed, 20 Dec 2017 01:50:09 +0100
+Subject: [PATCH 36/50] stage: Push framebuffer before setting up viewport
+
+When capture_view* functions are called with the paint flag set
+to TRUE, we need to setup the framebuffer, however this was
+happening after setting up the viewport, while the viewport
+needs the framebuffer to be valid when calling cogl_set_viewport.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=791809
+---
+ clutter/clutter/clutter-stage.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/clutter/clutter/clutter-stage.c b/clutter/clutter/clutter-stage.c
+index 02ab07b86..0a800f426 100644
+--- a/clutter/clutter/clutter-stage.c
++++ b/clutter/clutter/clutter-stage.c
+@@ -4726,8 +4726,8 @@ capture_view (ClutterStage          *stage,
+ 
+   if (paint)
+     {
+-      _clutter_stage_maybe_setup_viewport (stage, view);
+       cogl_push_framebuffer (framebuffer);
++      _clutter_stage_maybe_setup_viewport (stage, view);
+       clutter_stage_do_paint_view (stage, view, rect);
+     }
+ 
+@@ -4829,8 +4829,8 @@ capture_view_into (ClutterStage          *stage,
+ 
+   if (paint)
+     {
+-      _clutter_stage_maybe_setup_viewport (stage, view);
+       cogl_push_framebuffer (framebuffer);
++      _clutter_stage_maybe_setup_viewport (stage, view);
+       clutter_stage_do_paint_view (stage, view, rect);
+     }
+ 
+-- 
+2.17.0
+
+
+From 699fd31e77b79a99898c19b994c1c00467f937a4 Mon Sep 17 00:00:00 2001
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Thu, 21 Dec 2017 11:30:16 +0100
+Subject: [PATCH 37/50] wayland: Only send full sequences of touch events to
+ clients
+
+If input happens to be grabbed somewhere along the shell, and ungrabbed
+while a touch operation is ongoing, the wayland bits will happily start
+sending wl_touch.update events from an undeterminate point, without
+clients having ever received wl_touch.down for that id.
+
+Consider those touches grabbed for the entirety of their lifetime, if
+wl_touch.down wasn't received by the client, no other events will.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=776220
+---
+ src/wayland/meta-wayland-touch.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-touch.c b/src/wayland/meta-wayland-touch.c
+index 6593d7c87..55b772588 100644
+--- a/src/wayland/meta-wayland-touch.c
++++ b/src/wayland/meta-wayland-touch.c
+@@ -56,6 +56,7 @@ struct _MetaWaylandTouchInfo
+   gfloat x;
+   gfloat y;
+   guint updated : 1;
++  guint begin_delivered : 1;
+ };
+ 
+ static void
+@@ -278,6 +279,8 @@ handle_touch_begin (MetaWaylandTouch   *touch,
+                           wl_fixed_from_double (touch_info->x),
+                           wl_fixed_from_double (touch_info->y));
+     }
++
++  touch_info->begin_delivered = TRUE;
+ }
+ 
+ static void
+@@ -292,7 +295,7 @@ handle_touch_update (MetaWaylandTouch   *touch,
+   sequence = clutter_event_get_event_sequence (event);
+   touch_info = touch_get_info (touch, sequence, FALSE);
+ 
+-  if (!touch_info)
++  if (!touch_info || !touch_info->begin_delivered)
+     return;
+ 
+   l = &touch_info->touch_surface->resource_list;
+@@ -321,12 +324,15 @@ handle_touch_end (MetaWaylandTouch   *touch,
+   if (!touch_info)
+     return;
+ 
+-  l = &touch_info->touch_surface->resource_list;
+-  wl_resource_for_each(resource, l)
++  if (touch_info->begin_delivered)
+     {
+-      wl_touch_send_up (resource, touch_info->slot_serial,
+-                        clutter_event_get_time (event),
+-                        touch_info->slot);
++      l = &touch_info->touch_surface->resource_list;
++      wl_resource_for_each(resource, l)
++        {
++          wl_touch_send_up (resource, touch_info->slot_serial,
++                            clutter_event_get_time (event),
++                            touch_info->slot);
++        }
+     }
+ 
+   g_hash_table_remove (touch->touches, sequence);
+-- 
+2.17.0
+
+
+From 415584344a5d4b577321616f1ddeb4c4536253bc Mon Sep 17 00:00:00 2001
+From: Georges Basile Stavracas Neto <georges.stavracas@gmail.com>
+Date: Thu, 14 Dec 2017 11:38:54 -0200
+Subject: [PATCH 38/50] Revert "window: Raise and lower tile match in tandem"
+
+Raising and lowering windows in tandem without a proper grouping
+mechanism ended up being more annoying than functional.
+
+This reverts commit e76a0f564c1e07e32fe857d0f8e5b723c3bbe57d.
+---
+ src/core/window.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
+
+diff --git a/src/core/window.c b/src/core/window.c
+index c2d9869d2..10fc79664 100644
+--- a/src/core/window.c
++++ b/src/core/window.c
+@@ -4939,13 +4939,7 @@ meta_window_raise (MetaWindow  *window)
+    * the child windows appropriately.
+    */
+   if (window->screen->stack == ancestor->screen->stack)
+-    {
+-      /* If the window has a tile sibling, raise it before raising the window itself */
+-      if (window->tile_match)
+-        meta_stack_raise (window->tile_match->screen->stack, window->tile_match);
+-
+-      meta_stack_raise (window->screen->stack, ancestor);
+-    }
++    meta_stack_raise (window->screen->stack, ancestor);
+   else
+     {
+       meta_warning (
+@@ -4977,10 +4971,6 @@ meta_window_lower (MetaWindow  *window)
+   meta_topic (META_DEBUG_WINDOW_OPS,
+               "Lowering window %s\n", window->desc);
+ 
+-  /* If the window has a tile sibling, lower it before loweting the window itself */
+-  if (window->tile_match)
+-    meta_stack_lower (window->tile_match->screen->stack, window->tile_match);
+-
+   meta_stack_lower (window->screen->stack, window);
+ }
+ 
+-- 
+2.17.0
+
+
+From 0bd1d7cf09be046d6a698fde88540bfb8cbc78e7 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Matej=20Urban=C4=8Di=C4=8D?= <mateju@svn.gnome.org>
+Date: Sun, 31 Dec 2017 11:40:29 +0100
+Subject: [PATCH 39/50] Updated Slovenian translation
+
+---
+ po/sl.po | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/po/sl.po b/po/sl.po
+index 0b5ba7da2..4e05ef853 100644
+--- a/po/sl.po
++++ b/po/sl.po
+@@ -11,8 +11,8 @@ msgstr ""
+ "Project-Id-Version: mutter master\n"
+ "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+ "product=mutter&keywords=I18N+L10N&component=general\n"
+-"POT-Creation-Date: 2017-09-08 11:30+0200\n"
+-"PO-Revision-Date: 2017-09-08 11:36+0200\n"
++"POT-Creation-Date: 2017-11-17 16:03+0000\n"
++"PO-Revision-Date: 2017-12-31 11:04+0100\n"
+ "Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+ "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
+ "Language: sl_SI\n"
+@@ -22,7 +22,7 @@ msgstr ""
+ "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+ "%100==4 ? 3 : 0);\n"
+ "X-Poedit-SourceCharset: utf-8\n"
+-"X-Generator: Poedit 2.0.1\n"
++"X-Generator: Poedit 2.0.4\n"
+ 
+ #: data/50-mutter-navigation.xml:6
+ msgid "Navigation"
+@@ -176,7 +176,7 @@ msgstr "Premakni na zgornjo delovno površino"
+ msgid "Move to workspace below"
+ msgstr "Premakni na spodnjo delovno površino"
+ 
+-#: data/50-mutter-system.xml:6
++#: data/50-mutter-system.xml:6 data/50-mutter-wayland.xml:6
+ msgid "System"
+ msgstr "Sistem"
+ 
+@@ -188,6 +188,10 @@ msgstr "Pokaži možnost zagona ukazne vrstice"
+ msgid "Show the activities overview"
+ msgstr "Pokaži okno pregleda dejavnosti"
+ 
++#: data/50-mutter-wayland.xml:8
++msgid "Restore the keyboard shortcuts"
++msgstr "Obnovi tipkovne bližnjice"
++
+ #: data/50-mutter-windows.xml:6
+ msgid "Windows"
+ msgstr "Okna"
+@@ -499,7 +503,7 @@ msgstr "Ponovno omogoči tipkovne bližnjice"
+ #. TRANSLATORS: This string refers to a button that switches between
+ #. * different modes.
+ #.
+-#: src/backends/meta-input-settings.c:2151
++#: src/backends/meta-input-settings.c:2167
+ #, c-format
+ msgid "Mode Switch (Group %d)"
+ msgstr "Preklop načina (skupina %d)"
+@@ -507,37 +511,37 @@ msgstr "Preklop načina (skupina %d)"
+ #. TRANSLATORS: This string refers to an action, cycles drawing tablets'
+ #. * mapping through the available outputs.
+ #.
+-#: src/backends/meta-input-settings.c:2174
++#: src/backends/meta-input-settings.c:2190
+ msgid "Switch monitor"
+ msgstr "Nadzornik preklopa"
+ 
+-#: src/backends/meta-input-settings.c:2176
++#: src/backends/meta-input-settings.c:2192
+ msgid "Show on-screen help"
+ msgstr "Pokaži zaslonsko pomoč"
+ 
+-#: src/backends/meta-monitor-manager.c:903
++#: src/backends/meta-monitor-manager.c:908
+ msgid "Built-in display"
+ msgstr "Vgrajen zaslon"
+ 
+-#: src/backends/meta-monitor-manager.c:926
++#: src/backends/meta-monitor-manager.c:931
+ msgid "Unknown"
+ msgstr "Neznano"
+ 
+-#: src/backends/meta-monitor-manager.c:928
++#: src/backends/meta-monitor-manager.c:933
+ msgid "Unknown Display"
+ msgstr "Neznan zaslon"
+ 
+ #. TRANSLATORS: this is a monitor vendor name, followed by a
+ #. * size in inches, like 'Dell 15"'
+ #.
+-#: src/backends/meta-monitor-manager.c:936
++#: src/backends/meta-monitor-manager.c:941
+ #, c-format
+ msgid "%s %s"
+ msgstr "%s %s"
+ 
+ #. This probably means that a non-WM compositor like xcompmgr is running;
+ #. * we have no way to get it to exit
+-#: src/compositor/compositor.c:476
++#: src/compositor/compositor.c:479
+ #, c-format
+ msgid ""
+ "Another compositing manager is already running on screen %i on display “%s”."
+@@ -643,7 +647,7 @@ msgstr "Vstavek Mutter za uporabo"
+ msgid "Workspace %d"
+ msgstr "Delovna površina %d"
+ 
+-#: src/core/screen.c:580
++#: src/core/screen.c:583
+ #, c-format
+ msgid ""
+ "Display “%s” already has a window manager; try using the --replace option to "
+@@ -652,7 +656,7 @@ msgstr ""
+ "Zaslon »%s« že ima določen upravljalnik oken; poskušajte uporabiti možnost --"
+ "replace za zamenjavo trenutnega upravljalnika zaslona."
+ 
+-#: src/core/screen.c:665
++#: src/core/screen.c:668
+ #, c-format
+ msgid "Screen %d on display “%s” is invalid\n"
+ msgstr "Zaslon %d na prikazu »%s« ni veljaven\n"
+-- 
+2.17.0
+
+
+From 294cceaeb8ecfd468132eff8af1f75c9d60ff21d Mon Sep 17 00:00:00 2001
+From: Daniel van Vugt <daniel.van.vugt@canonical.com>
+Date: Fri, 5 Jan 2018 17:47:41 +0800
+Subject: [PATCH 40/50] wayland: Ensure wl_shell_surfaces are set reactive
+
+Wayland clients using the wl_shell interface were never receiving mouse
+input. It meant they also couldn't be raised with a click.
+
+This was because the call to meta_wayland_surface_set_window for wl_shell
+surfaces did nothing while surface->window == window already. As such, it
+never called clutter_actor_set_reactive() and the wl_shell window remained
+a non-reactive actor.
+
+Just make sure surface->window isn't already set before calling
+meta_wayland_surface_set_window so it can actually do what it's meant to.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=790309
+---
+ src/wayland/meta-wayland-wl-shell.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-wl-shell.c b/src/wayland/meta-wayland-wl-shell.c
+index 1888c781c..3b69f39b0 100644
+--- a/src/wayland/meta-wayland-wl-shell.c
++++ b/src/wayland/meta-wayland-wl-shell.c
+@@ -474,10 +474,11 @@ create_wl_shell_surface_window (MetaWaylandSurface *surface)
+   MetaWaylandWlShellSurface *wl_shell_surface =
+     META_WAYLAND_WL_SHELL_SURFACE (surface->role);
+   MetaWaylandSurface *parent;
++  MetaWindow *window;
+   GList *l;
+ 
+-  surface->window = meta_window_wayland_new (meta_get_display (), surface);
+-  meta_wayland_surface_set_window (surface, surface->window);
++  window = meta_window_wayland_new (meta_get_display (), surface);
++  meta_wayland_surface_set_window (surface, window);
+ 
+   if (wl_shell_surface->title)
+     meta_window_set_title (surface->window, wl_shell_surface->title);
+-- 
+2.17.0
+
+
+From 97f099d8cec1628c42a76beee672661286b74d08 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Mon, 11 Dec 2017 18:22:21 +0800
+Subject: [PATCH 41/50] clutter/evdev: Ignore unknown touch points
+
+We might receive touch events for unknown touch points, for example
+when starting mutter while touching the screen (resulting in no
+touch-down event ever being received). Avoid crashing when this happens
+by just dropping these events on the floor.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=791371
+---
+ clutter/clutter/evdev/clutter-device-manager-evdev.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/clutter/clutter/evdev/clutter-device-manager-evdev.c b/clutter/clutter/evdev/clutter-device-manager-evdev.c
+index f40746a2f..f9a3a1423 100644
+--- a/clutter/clutter/evdev/clutter-device-manager-evdev.c
++++ b/clutter/clutter/evdev/clutter-device-manager-evdev.c
+@@ -1459,6 +1459,8 @@ process_device_event (ClutterDeviceManagerEvdev *manager_evdev,
+         slot = libinput_event_touch_get_slot (touch_event);
+         time_us = libinput_event_touch_get_time_usec (touch_event);
+         touch_state = clutter_seat_evdev_get_touch (seat, slot);
++        if (!touch_state)
++          break;
+ 
+         notify_touch_event (device, CLUTTER_TOUCH_END, time_us, slot,
+ 			    touch_state->coords.x, touch_state->coords.y);
+@@ -1497,6 +1499,9 @@ process_device_event (ClutterDeviceManagerEvdev *manager_evdev,
+                                                     stage_height);
+ 
+         touch_state = clutter_seat_evdev_get_touch (seat, slot);
++        if (!touch_state)
++          break;
++
+         touch_state->coords.x = x;
+         touch_state->coords.y = y;
+ 
+-- 
+2.17.0
+
+
+From 6df02e542935150f621b4da41439443de983838c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Wed, 10 Jan 2018 11:53:31 +0800
+Subject: [PATCH 42/50] input-settings/x11: Fix tap-and-drag libinput property
+ name
+
+It's "libinput Tapping Drag Enabled", not "libinput TappingDrag
+Enabled".
+
+https://bugzilla.gnome.org/show_bug.cgi?id=775755
+---
+ src/backends/x11/meta-input-settings-x11.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/backends/x11/meta-input-settings-x11.c b/src/backends/x11/meta-input-settings-x11.c
+index 98d05a9ed..d1ee37ac2 100644
+--- a/src/backends/x11/meta-input-settings-x11.c
++++ b/src/backends/x11/meta-input-settings-x11.c
+@@ -239,7 +239,7 @@ meta_input_settings_x11_set_tap_and_drag_enabled (MetaInputSettings  *settings,
+ {
+   guchar value = (enabled) ? 1 : 0;
+ 
+-  change_property (device, "libinput TappingDrag Enabled",
++  change_property (device, "libinput Tapping Drag Enabled",
+                    XA_INTEGER, 8, &value, 1);
+ }
+ 
+-- 
+2.17.0
+
+
+From 77dd1bf63532946ba88bc959e9cc8a7991665035 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Thu, 18 Jan 2018 13:58:02 +0100
+Subject: [PATCH 43/50] wayland: shortcuts inhibitor requires a window
+
+Issuing a shortcut inhibit request for a surface without a window set
+will lead to a crash when trying to show the shortcut inhibitor dialog.
+
+In such a case, it's safer to deny the request.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=792599
+---
+ src/wayland/meta-wayland-inhibit-shortcuts.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/wayland/meta-wayland-inhibit-shortcuts.c b/src/wayland/meta-wayland-inhibit-shortcuts.c
+index 8e5ed2413..272ae5f2c 100644
+--- a/src/wayland/meta-wayland-inhibit-shortcuts.c
++++ b/src/wayland/meta-wayland-inhibit-shortcuts.c
+@@ -148,7 +148,9 @@ zwp_keyboard_shortcuts_inhibit_manager_inhibit_shortcuts (struct wl_client   *cl
+                       G_CALLBACK (surface_destroyed_cb),
+                       shortcut_inhibit);
+ 
+-  meta_wayland_surface_show_inhibit_shortcuts_dialog (surface, seat);
++  /* Cannot grant shortcuts to a surface without any window */
++  if (meta_wayland_surface_get_toplevel_window (surface))
++    meta_wayland_surface_show_inhibit_shortcuts_dialog (surface, seat);
+ 
+   wl_resource_set_implementation (keyboard_shortcuts_inhibit_resource,
+                                   &meta_keyboard_shortcuts_inhibit_interface,
+-- 
+2.17.0
+
+
+From 71b4ef5940d16f7d3cb7dca5c224784315803492 Mon Sep 17 00:00:00 2001
+From: Jeremy Nickurak <jeremy@nickurak.ca>
+Date: Thu, 11 Jan 2018 11:31:42 -0700
+Subject: [PATCH 44/50] Don't attempt to get monitor geometry on non-existent
+ monitors
+
+https://bugzilla.gnome.org/show_bug.cgi?id=788834
+---
+ src/x11/window-x11.c | 49 +++++++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 23 deletions(-)
+
+diff --git a/src/x11/window-x11.c b/src/x11/window-x11.c
+index 5a6f113b0..dd97276d8 100644
+--- a/src/x11/window-x11.c
++++ b/src/x11/window-x11.c
+@@ -2092,30 +2092,33 @@ meta_window_move_resize_request (MetaWindow *window,
+       rect.width = width;
+       rect.height = height;
+ 
+-      meta_screen_get_monitor_geometry (window->screen, window->monitor->number, &monitor_rect);
+-
+-      /* Workaround braindead legacy apps that don't know how to
+-       * fullscreen themselves properly - don't get fooled by
+-       * windows which hide their titlebar when maximized or which are
+-       * client decorated; that's not the same as fullscreen, even
+-       * if there are no struts making the workarea smaller than
+-       * the monitor.
+-       */
+-      if (meta_prefs_get_force_fullscreen() &&
+-          !window->hide_titlebar_when_maximized &&
+-          (window->decorated || !meta_window_is_client_decorated (window)) &&
+-          meta_rectangle_equal (&rect, &monitor_rect) &&
+-          window->has_fullscreen_func &&
+-          !window->fullscreen)
++      if (window->monitor)
+         {
+-          /*
+-          meta_topic (META_DEBUG_GEOMETRY,
+-          */
+-          meta_warning (
+-                      "Treating resize request of legacy application %s as a "
+-                      "fullscreen request\n",
+-                      window->desc);
+-          meta_window_make_fullscreen_internal (window);
++          meta_screen_get_monitor_geometry (window->screen, window->monitor->number, &monitor_rect);
++
++          /* Workaround braindead legacy apps that don't know how to
++           * fullscreen themselves properly - don't get fooled by
++           * windows which hide their titlebar when maximized or which are
++           * client decorated; that's not the same as fullscreen, even
++           * if there are no struts making the workarea smaller than
++           * the monitor.
++           */
++          if (meta_prefs_get_force_fullscreen() &&
++              !window->hide_titlebar_when_maximized &&
++              (window->decorated || !meta_window_is_client_decorated (window)) &&
++              meta_rectangle_equal (&rect, &monitor_rect) &&
++              window->has_fullscreen_func &&
++              !window->fullscreen)
++            {
++              /*
++              meta_topic (META_DEBUG_GEOMETRY,
++              */
++              meta_warning (
++                           "Treating resize request of legacy application %s as a "
++                           "fullscreen request\n",
++                           window->desc);
++              meta_window_make_fullscreen_internal (window);
++            }
+         }
+ 
+       adjust_for_gravity (window, TRUE, gravity, &rect);
+-- 
+2.17.0
+
+
+From 84ee785399298ae59ac34fce8da3a5bc8ae1159a Mon Sep 17 00:00:00 2001
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Sun, 21 Jan 2018 22:40:09 +0100
+Subject: [PATCH 45/50] monitor: Set MINIMUM_LOGICAL_HEIGHT to 480
+
+Using 800x600 as minimum logical size is very 4:3 thinking, while a lot of
+modern devices are 16:9. The specific reason for this commit is to allow
+1.5 scaling at mini-laptops (clamshell devices) with e.g. a 5.5"
+1280x720 screen. Given that this device has a keyboard, one obviously
+is not holding it very close to ones eyes and at 220 dpi that means the text
+is too small at scale 1.0. For one real world example of such a device see:
+https://en.wikipedia.org/wiki/GPD_Win
+
+https://bugzilla.gnome.org/show_bug.cgi?id=792765
+---
+ src/backends/meta-monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/backends/meta-monitor.c b/src/backends/meta-monitor.c
+index f9233251c..9c58ccb9f 100644
+--- a/src/backends/meta-monitor.c
++++ b/src/backends/meta-monitor.c
+@@ -31,7 +31,7 @@
+ #define MINIMUM_SCALE_FACTOR 1.0f
+ #define MAXIMUM_SCALE_FACTOR 4.0f
+ #define MINIMUM_LOGICAL_WIDTH 800
+-#define MINIMUM_LOGICAL_HEIGHT 600
++#define MINIMUM_LOGICAL_HEIGHT 480
+ #define MAXIMUM_REFRESH_RATE_DIFF 0.001
+ 
+ typedef struct _MetaMonitorMode
+-- 
+2.17.0
+
+
+From d32d358a6946fa560b038aeedd3483e34a882769 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Bal=C3=A1zs=20=C3=9Ar?= <balazs@urbalazs.hu>
+Date: Sat, 27 Jan 2018 08:01:38 +0000
+Subject: [PATCH 46/50] Update Hungarian translation
+
+---
+ po/hu.po | 62 ++++++++++++++++++++++++--------------------------------
+ 1 file changed, 26 insertions(+), 36 deletions(-)
+
+diff --git a/po/hu.po b/po/hu.po
+index ea48336c5..8d804ca8f 100644
+--- a/po/hu.po
++++ b/po/hu.po
+@@ -1,19 +1,19 @@
+-# Hungarian translation of mutter.
+-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017 Free Software Foundation, Inc.
++# Hungarian translation for mutter.
++# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 Free Software Foundation, Inc.
+ # This file is distributed under the same license as the mutter package.
+ #
+ # Andras Timar <timar at gnome dot hu>, 2002, 2003.
+ # Gabor Sari <saga at externet dot hu>, 2003.
+ # Laszlo Dvornik <dvornik at gnome dot hu>, 2004.
+ # Gabor Kelemen <kelemeng at gnome dot hu>, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013.
+-# Balázs Úr <urbalazs at gmail dot com>, 2013, 2014, 2015, 2016, 2017.
++# Balázs Úr <urbalazs at gmail dot com>, 2013, 2014, 2015, 2016, 2017, 2018.
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: mutter master\n"
+ "Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?"
+ "product=mutter&keywords=I18N+L10N&component=general\n"
+-"POT-Creation-Date: 2017-08-29 16:09+0000\n"
+-"PO-Revision-Date: 2017-09-05 17:35+0200\n"
++"POT-Creation-Date: 2017-11-17 16:03+0000\n"
++"PO-Revision-Date: 2018-01-27 09:00+0100\n"
+ "Last-Translator: Balázs Úr <urbalazs@gmail.com>\n"
+ "Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
+ "Language: hu\n"
+@@ -175,7 +175,7 @@ msgstr "Áthelyezés a felső munkaterületre"
+ msgid "Move to workspace below"
+ msgstr "Áthelyezés az alsó munkaterületre"
+ 
+-#: data/50-mutter-system.xml:6
++#: data/50-mutter-system.xml:6 data/50-mutter-wayland.xml:6
+ msgid "System"
+ msgstr "Rendszer"
+ 
+@@ -187,6 +187,10 @@ msgstr "A parancs futtatása ablak megjelenítése"
+ msgid "Show the activities overview"
+ msgstr "A tevékenységek áttekintés megjelenítése"
+ 
++#: data/50-mutter-wayland.xml:8
++msgid "Restore the keyboard shortcuts"
++msgstr "Gyorsbillentyűk helyreállítása"
++
+ #: data/50-mutter-windows.xml:6
+ msgid "Windows"
+ msgstr "Ablakok"
+@@ -404,20 +408,6 @@ msgid "Enable experimental features"
+ msgstr "Kísérleti funkciók engedélyezése"
+ 
+ #: data/org.gnome.mutter.gschema.xml.in:108
+-#| msgid ""
+-#| "To enable experimental features, add the feature keyword to the list. "
+-#| "Whether the feature requires restarting the compositor depends on the "
+-#| "given feature. Any experimental feature is not required to still be "
+-#| "available, or configurable. Don’t expect adding anything in this setting "
+-#| "to be future proof. Currently possible keywords: • “monitor-config-"
+-#| "manager” — use the new monitor configuration system, aimed to replace the "
+-#| "old one. This enables a higher level configuration API to be used by "
+-#| "configuration applications, as well as the ability to configure per "
+-#| "logical monitor scale. • “scale-monitor-framebuffer” — makes mutter "
+-#| "default to layout logical monitors in a logical pixel coordinate space, "
+-#| "while scaling monitor framebuffers instead of window content, to manage "
+-#| "HiDPI monitors. Does not require a restart. Also enabling “monitor-config-"
+-#| "manager” is required for this feature to be enabled."
+ msgid ""
+ "To enable experimental features, add the feature keyword to the list. "
+ "Whether the feature requires restarting the compositor depends on the given "
+@@ -432,12 +422,12 @@ msgid ""
+ "screen cast support."
+ msgstr ""
+ "A kísérleti funkciók engedélyezéséhez adja hozzá a funkció kulcsszavát a "
+-"listához. A funkció a betűszedő újraindítását igényelheti az adott funkciótól "
+-"függően. Egyik kísérleti funkciónál sem szükséges, hogy továbbra is elérhető "
+-"vagy beállítható legyen. Ne várja el azt, hogy ha bármit hozzáad ehhez a "
+-"beállításhoz, akkor az a jövőben is elérhető lesz. Jelenleg lehetséges "
+-"kulcsszavak: • „scale-monitor-framebuffer” — alapértelmezetté teszi a mutter "
+-"programot a logikai monitorok elrendezéséhez egy logikai "
++"listához. A funkció a betűszedő újraindítását igényelheti az adott "
++"funkciótól függően. Egyik kísérleti funkciónál sem szükséges, hogy továbbra "
++"is elérhető vagy beállítható legyen. Ne várja el azt, hogy ha bármit hozzáad "
++"ehhez a beállításhoz, akkor az a jövőben is elérhető lesz. Jelenleg "
++"lehetséges kulcsszavak: • „scale-monitor-framebuffer” — alapértelmezetté "
++"teszi a mutter programot a logikai monitorok elrendezéséhez egy logikai "
+ "képpontkoordináta-térben, miközben átméretezi a monitor keretpufferét az "
+ "ablaktartalom helyett azért, hogy kezelje a HiDPI monitorokat. Nem igényel "
+ "újraindítást. • „remote-desktop” — engedélyezi a távoli asztal támogatást. A "
+@@ -516,7 +506,7 @@ msgstr "Gyorsbillentyűk újraengedélyezése"
+ #. TRANSLATORS: This string refers to a button that switches between
+ #. * different modes.
+ #.
+-#: src/backends/meta-input-settings.c:2151
++#: src/backends/meta-input-settings.c:2167
+ #, c-format
+ msgid "Mode Switch (Group %d)"
+ msgstr "Módkapcsoló (%d. csoport)"
+@@ -524,37 +514,37 @@ msgstr "Módkapcsoló (%d. csoport)"
+ #. TRANSLATORS: This string refers to an action, cycles drawing tablets'
+ #. * mapping through the available outputs.
+ #.
+-#: src/backends/meta-input-settings.c:2174
++#: src/backends/meta-input-settings.c:2190
+ msgid "Switch monitor"
+ msgstr "Monitorváltás"
+ 
+-#: src/backends/meta-input-settings.c:2176
++#: src/backends/meta-input-settings.c:2192
+ msgid "Show on-screen help"
+ msgstr "Képernyősúgó megjelenítése"
+ 
+-#: src/backends/meta-monitor-manager.c:903
++#: src/backends/meta-monitor-manager.c:908
+ msgid "Built-in display"
+ msgstr "Beépített kijelző"
+ 
+-#: src/backends/meta-monitor-manager.c:926
++#: src/backends/meta-monitor-manager.c:931
+ msgid "Unknown"
+ msgstr "Ismeretlen"
+ 
+-#: src/backends/meta-monitor-manager.c:928
++#: src/backends/meta-monitor-manager.c:933
+ msgid "Unknown Display"
+ msgstr "Ismeretlen kijelző"
+ 
+ #. TRANSLATORS: this is a monitor vendor name, followed by a
+ #. * size in inches, like 'Dell 15"'
+ #.
+-#: src/backends/meta-monitor-manager.c:936
++#: src/backends/meta-monitor-manager.c:941
+ #, c-format
+ msgid "%s %s"
+ msgstr "%s %s"
+ 
+ #. This probably means that a non-WM compositor like xcompmgr is running;
+ #. * we have no way to get it to exit
+-#: src/compositor/compositor.c:476
++#: src/compositor/compositor.c:479
+ #, c-format
+ msgid ""
+ "Another compositing manager is already running on screen %i on display “%s”."
+@@ -662,7 +652,7 @@ msgstr "Használandó Mutter bővítmény"
+ msgid "Workspace %d"
+ msgstr "%d. munkaterület"
+ 
+-#: src/core/screen.c:580
++#: src/core/screen.c:583
+ #, c-format
+ msgid ""
+ "Display “%s” already has a window manager; try using the --replace option to "
+@@ -671,7 +661,7 @@ msgstr ""
+ "A(z) „%s” kijelző már rendelkezik ablakkezelővel; próbálja a --replace "
+ "kapcsolóval helyettesíteni a jelenlegi ablakkezelőt."
+ 
+-#: src/core/screen.c:665
++#: src/core/screen.c:668
+ #, c-format
+ msgid "Screen %d on display “%s” is invalid\n"
+ msgstr "A(z) %d. képernyő a(z) „%s” megjelenítőn érvénytelen\n"
+-- 
+2.17.0
+
+
+From c02679f91787a80922d2cc08b16bb1d07a25ff43 Mon Sep 17 00:00:00 2001
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Tue, 30 Jan 2018 13:07:32 +0100
+Subject: [PATCH 47/50] backends/x11: Preserve XI1 XDevice throughout
+ ClutterInputDevice lifetime
+
+Opening and closing the device may result into XI2 grabs being cut short,
+resulting into pad buttons being rendered ineffective, and other possible
+misbehaviors. This is an XInput flaw that fell in the gap between XI1 and
+XI2, and has no easy fix. It pays us for mixing both versions, I guess...
+
+Work this around by keeping the XI1 XDevice attached to the
+ClutterInputDevice, this way it will live long enough that this is not
+a concern.
+
+Investigation of this bug was mostly carried by Peter Hutterer, I'm just
+the executing hand.
+
+https://gitlab.gnome.org/GNOME/mutter/issues/7
+
+Closes: #7
+---
+ src/backends/x11/meta-input-settings-x11.c | 48 +++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 6 deletions(-)
+
+diff --git a/src/backends/x11/meta-input-settings-x11.c b/src/backends/x11/meta-input-settings-x11.c
+index d1ee37ac2..f14564ed1 100644
+--- a/src/backends/x11/meta-input-settings-x11.c
++++ b/src/backends/x11/meta-input-settings-x11.c
+@@ -55,6 +55,46 @@ enum {
+   SCROLL_METHOD_NUM_FIELDS
+ };
+ 
++static void
++device_free_xdevice (gpointer user_data)
++{
++  MetaDisplay *display = meta_get_display ();
++  MetaBackend *backend = meta_get_backend ();
++  Display *xdisplay = meta_backend_x11_get_xdisplay (META_BACKEND_X11 (backend));
++  XDevice *xdev = user_data;
++
++  meta_error_trap_push (display);
++  XCloseDevice (xdisplay, xdev);
++  meta_error_trap_pop (display);
++}
++
++static XDevice *
++device_ensure_xdevice (ClutterInputDevice *device)
++{
++  MetaDisplay *display = meta_get_display ();
++  MetaBackend *backend = meta_get_backend ();
++  Display *xdisplay = meta_backend_x11_get_xdisplay (META_BACKEND_X11 (backend));
++  int device_id = clutter_input_device_get_device_id (device);
++  XDevice *xdev = NULL;
++
++  xdev = g_object_get_data (G_OBJECT (device), "meta-input-settings-xdevice");
++  if (xdev)
++    return xdev;
++
++  meta_error_trap_push (display);
++  xdev = XOpenDevice (xdisplay, device_id);
++  meta_error_trap_pop (display);
++
++  if (xdev)
++    {
++      g_object_set_data_full (G_OBJECT (device),
++                              "meta-input-settings-xdevice",
++                              xdev, device_free_xdevice);
++    }
++
++  return xdev;
++}
++
+ static void *
+ get_property (ClutterInputDevice *device,
+               const gchar        *property,
+@@ -540,7 +580,6 @@ meta_input_settings_x11_set_tablet_mapping (MetaInputSettings     *settings,
+   MetaDisplay *display = meta_get_display ();
+   MetaBackend *backend = meta_get_backend ();
+   Display *xdisplay = meta_backend_x11_get_xdisplay (META_BACKEND_X11 (backend));
+-  int device_id = clutter_input_device_get_device_id (device);
+   XDevice *xdev;
+ 
+   if (!display)
+@@ -548,13 +587,12 @@ meta_input_settings_x11_set_tablet_mapping (MetaInputSettings     *settings,
+ 
+   /* Grab the puke bucket! */
+   meta_error_trap_push (display);
+-  xdev = XOpenDevice (xdisplay, device_id);
++  xdev = device_ensure_xdevice (device);
+   if (xdev)
+     {
+       XSetDeviceMode (xdisplay, xdev,
+                       mapping == G_DESKTOP_TABLET_MAPPING_ABSOLUTE ?
+                       Absolute : Relative);
+-      XCloseDevice (xdisplay, xdev);
+     }
+ 
+   if (meta_error_trap_pop_with_return (display))
+@@ -737,7 +775,6 @@ meta_input_settings_x11_set_stylus_button_map (MetaInputSettings          *setti
+   MetaDisplay *display = meta_get_display ();
+   MetaBackend *backend = meta_get_backend ();
+   Display *xdisplay = meta_backend_x11_get_xdisplay (META_BACKEND_X11 (backend));
+-  int device_id = clutter_input_device_get_device_id (device);
+   XDevice *xdev;
+ 
+   if (!display)
+@@ -745,7 +782,7 @@ meta_input_settings_x11_set_stylus_button_map (MetaInputSettings          *setti
+ 
+   /* Grab the puke bucket! */
+   meta_error_trap_push (display);
+-  xdev = XOpenDevice (xdisplay, device_id);
++  xdev = device_ensure_xdevice (device);
+   if (xdev)
+     {
+       guchar map[3] = {
+@@ -755,7 +792,6 @@ meta_input_settings_x11_set_stylus_button_map (MetaInputSettings          *setti
+       };
+ 
+       XSetDeviceButtonMapping (xdisplay, xdev, map, G_N_ELEMENTS (map));
+-      XCloseDevice (xdisplay, xdev);
+     }
+ 
+   if (meta_error_trap_pop_with_return (display))
+-- 
+2.17.0
+
+
+From a97d1dedf552a173228a5efe9fae861df5eed84f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Fri, 2 Feb 2018 14:34:36 +0800
+Subject: [PATCH 48/50] cogl/x11/renderer: Silence introspection warning
+
+We don't introspect CoglRenderer, so we shouldn't introspect API using it
+either.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=739178
+---
+ cogl/cogl/cogl-xlib-renderer.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cogl/cogl/cogl-xlib-renderer.h b/cogl/cogl/cogl-xlib-renderer.h
+index 3c0db189b..2a4f5d6ea 100644
+--- a/cogl/cogl/cogl-xlib-renderer.h
++++ b/cogl/cogl/cogl-xlib-renderer.h
+@@ -168,7 +168,7 @@ cogl_xlib_renderer_set_event_retrieval_enabled (CoglRenderer *renderer,
+                                                 CoglBool enable);
+ 
+ /**
+- * cogl_xlib_renderer_set_threaded_swap_wait_enabled:
++ * cogl_xlib_renderer_set_threaded_swap_wait_enabled: (skip)
+  * @renderer: a #CoglRenderer
+  * @enable: The new value
+  *
+-- 
+2.17.0
+
+
+From 4b2d21ff03ed389138fcb9bca778aec02bafcadb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Fri, 2 Feb 2018 14:34:50 +0800
+Subject: [PATCH 49/50] renderer/x11: Enable GPU memory purge error extension
+ if available
+
+This was done by the clutter X11 backend before prior to introducing
+MetaRenderer, but during that work, enabling of said extension was lost.
+Let's turn it on again.
+
+https://bugzilla.gnome.org/show_bug.cgi?id=739178
+---
+ src/backends/x11/meta-backend-x11.c  | 2 --
+ src/backends/x11/meta-renderer-x11.c | 1 +
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/backends/x11/meta-backend-x11.c b/src/backends/x11/meta-backend-x11.c
+index 233532435..c7602cc70 100644
+--- a/src/backends/x11/meta-backend-x11.c
++++ b/src/backends/x11/meta-backend-x11.c
+@@ -705,8 +705,6 @@ meta_backend_x11_init (MetaBackendX11 *x11)
+    */
+   XInitThreads();
+ 
+-  clutter_x11_request_reset_on_video_memory_purge ();
+-
+   /* We do X11 event retrieval ourselves */
+   clutter_x11_disable_event_retrieval ();
+ }
+diff --git a/src/backends/x11/meta-renderer-x11.c b/src/backends/x11/meta-renderer-x11.c
+index 90924e038..003211d85 100644
+--- a/src/backends/x11/meta-renderer-x11.c
++++ b/src/backends/x11/meta-renderer-x11.c
+@@ -73,6 +73,7 @@ meta_renderer_x11_create_cogl_renderer (MetaRenderer *renderer)
+   cogl_renderer = cogl_renderer_new ();
+   cogl_renderer_set_custom_winsys (cogl_renderer, get_x11_cogl_winsys_vtable);
+   cogl_xlib_renderer_set_foreign_display (cogl_renderer, xdisplay);
++  cogl_xlib_renderer_request_reset_on_video_memory_purge (cogl_renderer, TRUE);
+ 
+   /* Set up things so that if the INTEL_swap_event extension is not present,
+    * but the driver is known to have good thread support, we use an extra
+-- 
+2.17.0
+
+
+From 543d031a55164e8f4cd5bb0e906fbef4cca0cf90 Mon Sep 17 00:00:00 2001
+From: GNOME Translation Robot <gnome-sysadmin@gnome.org>
+Date: Thu, 1 Mar 2018 10:46:14 +0000
+Subject: [PATCH 50/50] Update Scottish Gaelic translation
+
+---
+ po/gd.po | 307 +++++++++++++++----------------------------------------
+ 1 file changed, 81 insertions(+), 226 deletions(-)
+
+diff --git a/po/gd.po b/po/gd.po
+index 8f9bb5bed..f56ded49e 100644
+--- a/po/gd.po
++++ b/po/gd.po
+@@ -1,14 +1,13 @@
+ # Scottish Gaelic translation for mutter.
+ # Copyright (C) 2016 mutter's COPYRIGHT HOLDER
+ # This file is distributed under the same license as the mutter package.
+-# GunChleoc <fios@foramnagaidhlig.net>, 2016, 2017.
++# GunChleoc <fios@foramnagaidhlig.net>, 2016, 2017, 2018.
+ msgid ""
+ msgstr ""
+ "Project-Id-Version: mutter master\n"
+-"Report-Msgid-Bugs-To: https://bugzilla.gnome.org/enter_bug.cgi?product=mutte"
+-"r&keywords=I18N+L10N&component=general\n"
+-"POT-Creation-Date: 2017-03-02 11:37+0000\n"
+-"PO-Revision-Date: 2017-03-07 11:59+0100\n"
++"Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/mutter/issues\n"
++"POT-Creation-Date: 2018-01-27 08:02+0000\n"
++"PO-Revision-Date: 2018-03-01 10:45+0100\n"
+ "Last-Translator: GunChleoc <fios@foramnagaidhlig.net>\n"
+ "Language-Team: Fòram na Gàidhlig\n"
+ "Language: gd\n"
+@@ -18,6 +17,7 @@ msgstr ""
+ "Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : "
+ "(n > 2 && n < 20) ? 2 : 3;\n"
+ "X-Generator: Virtaal 0.7.1\n"
++"(n > 2 && n < 20) ? 2: 3;\n"
+ "X-Project-Style: gnome\n"
+ 
+ #: data/50-mutter-navigation.xml:6
+@@ -166,13 +166,13 @@ msgstr "Gluais dhan rum-obrach air an taobh deas"
+ 
+ #: data/50-mutter-navigation.xml:135
+ msgid "Move to workspace above"
+-msgstr "Gluais dhan rum-obrach aig a' bharr"
++msgstr "Gluais dhan rum-obrach aig a’ bharr"
+ 
+ #: data/50-mutter-navigation.xml:138
+ msgid "Move to workspace below"
+-msgstr "Gluais dhan rum-obrach aig a' bhonn"
++msgstr "Gluais dhan rum-obrach aig a’ bhonn"
+ 
+-#: data/50-mutter-system.xml:6
++#: data/50-mutter-system.xml:6 data/50-mutter-wayland.xml:6
+ msgid "System"
+ msgstr "An siostam"
+ 
+@@ -184,6 +184,10 @@ msgstr ""
+ msgid "Show the activities overview"
+ msgstr "Foir-shealladh air na gnìomhachdan"
+ 
++#: data/50-mutter-wayland.xml:8
++msgid "Restore the keyboard shortcuts"
++msgstr "Aisig ath-ghoiridean a’ mheur-chlàir"
++
+ #: data/50-mutter-windows.xml:6
+ msgid "Windows"
+ msgstr "Uinneagan"
+@@ -250,7 +254,7 @@ msgstr "Làn-mheudaich an uinneag gu h-ingearach"
+ 
+ #: data/50-mutter-windows.xml:39
+ msgid "Maximize window horizontally"
+-msgstr "Làn-mheudaich an uinneag air a' chòmhnard"
++msgstr "Làn-mheudaich an uinneag air a’ chòmhnard"
+ 
+ #: data/50-mutter-windows.xml:43
+ msgid "View split on left"
+@@ -262,284 +266,135 @@ msgstr "Sgoilt an t-sealladh air an taobh deas"
+ 
+ #: data/mutter.desktop.in:4
+ msgid "Mutter"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:7
+-msgid "Modifier to use for extended window management operations"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:8
+-msgid ""
+-"This key will initiate the \"overlay\", which is a combination window "
+-"overview and application launching system. The default is intended to be the "
+-"\"Windows key\" on PC hardware. It's expected that this binding either the "
+-"default or set to the empty string."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:20
+-msgid "Attach modal dialogs"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:21
+-msgid ""
+-"When true, instead of having independent titlebars, modal dialogs appear "
+-"attached to the titlebar of the parent window and are moved together with "
+-"the parent window."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:30
+-msgid "Enable edge tiling when dropping windows on screen edges"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:31
+-msgid ""
+-"If enabled, dropping windows on vertical screen edges maximizes them "
+-"vertically and resizes them horizontally to cover half of the available "
+-"area. Dropping windows on the top screen edge maximizes them completely."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:40
+-msgid "Workspaces are managed dynamically"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:41
+-msgid ""
+-"Determines whether workspaces are managed dynamically or whether there's a "
+-"static number of workspaces (determined by the num-workspaces key in org."
+-"gnome.desktop.wm.preferences)."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:50
+-msgid "Workspaces only on primary"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:51
+-msgid ""
+-"Determines whether workspace switching should happen for windows on all "
+-"monitors or only for windows on the primary monitor."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:59
+-msgid "No tab popup"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:60
+-msgid ""
+-"Determines whether the use of popup and highlight frame should be disabled "
+-"for window cycling."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:68
+-msgid "Delay focus changes until the pointer stops moving"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:69
+-msgid ""
+-"If set to true, and the focus mode is either \"sloppy\" or \"mouse\" then "
+-"the focus will not be changed immediately when entering a window, but only "
+-"after the pointer stops moving."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:79
+-msgid "Draggable border width"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:80
+-msgid ""
+-"The amount of total draggable borders. If the theme's visible borders are "
+-"not enough, invisible borders will be added to meet this value."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:89
+-msgid "Auto maximize nearly monitor sized windows"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:90
+-msgid ""
+-"If enabled, new windows that are initially the size of the monitor "
+-"automatically get maximized."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:98
+-msgid "Place new windows in the center"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:99
+-msgid ""
+-"When true, the new windows will always be put in the center of the active "
+-"screen of the monitor."
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:120
+-msgid "Select window from tab popup"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.gschema.xml.in:125
+-msgid "Cancel tab popup"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:6
+-msgid "Switch to VT 1"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:10
+-msgid "Switch to VT 2"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:14
+-msgid "Switch to VT 3"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:18
+-msgid "Switch to VT 4"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:22
+-msgid "Switch to VT 5"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:26
+-msgid "Switch to VT 6"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:30
+-msgid "Switch to VT 7"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:34
+-msgid "Switch to VT 8"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:38
+-msgid "Switch to VT 9"
+-msgstr ""
++msgstr "Mutter"
+ 
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:42
+-msgid "Switch to VT 10"
+-msgstr ""
+-
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:46
+-msgid "Switch to VT 11"
+-msgstr ""
++#: data/org.gnome.mutter.gschema.xml.in:155
++#| msgid "Switch monitor"
++msgid "Switch monitor configurations"
++msgstr "Gearr leum eadar rèiteachaidhean monatair"
+ 
+-#: data/org.gnome.mutter.wayland.gschema.xml.in:50
+-msgid "Switch to VT 12"
+-msgstr ""
++#. TRANSLATORS: This string refers to a button that switches between
++#. * different modes.
++#.
++#: src/backends/meta-input-settings.c:2167
++#, c-format
++#| msgid "Mode Switch: Mode %d"
++msgid "Mode Switch (Group %d)"
++msgstr "Suidse nam modh (Buidheann %d)"
+ 
+ #. TRANSLATORS: This string refers to an action, cycles drawing tablets'
+ #. * mapping through the available outputs.
+ #.
+-#: src/backends/meta-input-settings.c:1913
+-#| msgid "Switch system controls"
++#: src/backends/meta-input-settings.c:2190
+ msgid "Switch monitor"
+ msgstr "Gearr leum gu monatair eile"
+ 
+-#: src/backends/meta-input-settings.c:1915
++#: src/backends/meta-input-settings.c:2192
+ msgid "Show on-screen help"
+-msgstr "Seall a' chobhair air an sgrìn"
++msgstr "Seall a’ chobhair air an sgrìn"
+ 
+-#: src/backends/meta-monitor-manager.c:515
++#: src/backends/meta-monitor-manager.c:908
+ msgid "Built-in display"
+-msgstr "Uidheam-taisbeanaidh 'na broinn"
++msgstr "Uidheam-taisbeanaidh ’na broinn"
+ 
+-#: src/backends/meta-monitor-manager.c:538
++#: src/backends/meta-monitor-manager.c:931
+ msgid "Unknown"
+ msgstr "Chan eil fhios"
+ 
+-#: src/backends/meta-monitor-manager.c:540
++#: src/backends/meta-monitor-manager.c:933
+ msgid "Unknown Display"
+ msgstr "Uidheam-taisbeanaidh nach aithne dhuinn"
+ 
+ #. TRANSLATORS: this is a monitor vendor name, followed by a
+ #. * size in inches, like 'Dell 15"'
+ #.
+-#: src/backends/meta-monitor-manager.c:548
++#: src/backends/meta-monitor-manager.c:941
+ #, c-format
+ msgid "%s %s"
+ msgstr "%s %s"
+ 
+ #. This probably means that a non-WM compositor like xcompmgr is running;
+ #. * we have no way to get it to exit
+-#: src/compositor/compositor.c:471
++#: src/compositor/compositor.c:479
+ #, c-format
+ msgid ""
+-"Another compositing manager is already running on screen %i on display \"%s"
+-"\"."
++"Another compositing manager is already running on screen %i on display “%s”."
+ msgstr ""
+ 
+ #: src/core/bell.c:194
+ msgid "Bell event"
+ msgstr ""
+ 
+-#: src/core/delete.c:127
++#: src/core/display.c:608
+ #, c-format
+-msgid "“%s” is not responding."
+-msgstr ""
+-
+-#: src/core/delete.c:129
+-msgid "Application is not responding."
+-msgstr ""
+-
+-#: src/core/delete.c:134
+-msgid ""
+-"You may choose to wait a short while for it to continue or force the "
+-"application to quit entirely."
++msgid "Failed to open X Window System display “%s”\n"
+ msgstr ""
+ 
+-#: src/core/delete.c:141
+-msgid "_Wait"
+-msgstr "_Fuirich"
+-
+-#: src/core/delete.c:141
+-msgid "_Force Quit"
+-msgstr "Sparr _fàgail air"
+-
+-#: src/core/display.c:590
+-#, c-format
+-msgid "Failed to open X Window System display '%s'\n"
+-msgstr ""
+-
+-#: src/core/main.c:182
++#: src/core/main.c:189
+ msgid "Disable connection to session manager"
+ msgstr ""
+ 
+-#: src/core/main.c:188
++#: src/core/main.c:195
+ msgid "Replace the running window manager"
+ msgstr ""
+ 
+-#: src/core/main.c:194
++#: src/core/main.c:201
+ msgid "Specify session management ID"
+ msgstr ""
+ 
+-#: src/core/main.c:199
++#: src/core/main.c:206
+ msgid "X Display to use"
+ msgstr ""
+ 
+-#: src/core/main.c:205
++#: src/core/main.c:212
+ msgid "Initialize session from savefile"
+ msgstr ""
+ 
+-#: src/core/main.c:211
++#: src/core/main.c:218
+ msgid "Make X calls synchronous"
+ msgstr ""
+ 
+-#: src/core/main.c:218
++#: src/core/main.c:225
+ msgid "Run as a wayland compositor"
+ msgstr ""
+ 
+-#: src/core/main.c:224
++#: src/core/main.c:231
+ msgid "Run as a nested compositor"
+ msgstr ""
+ 
+-#: src/core/main.c:232
++#: src/core/main.c:239
+ msgid "Run as a full display server, rather than nested"
+ msgstr ""
+ 
++#. Translators: %s is a window title
++#: src/core/meta-close-dialog-default.c:147
++#, c-format
++msgid "“%s” is not responding."
++msgstr ""
++
++#: src/core/meta-close-dialog-default.c:149
++msgid "Application is not responding."
++msgstr ""
++
++#: src/core/meta-close-dialog-default.c:154
++msgid ""
++"You may choose to wait a short while for it to continue or force the "
++"application to quit entirely."
++msgstr ""
++
++#: src/core/meta-close-dialog-default.c:161
++msgid "_Force Quit"
++msgstr "Sparr _fàgail air"
++
++#: src/core/meta-close-dialog-default.c:161
++msgid "_Wait"
++msgstr "_Fuirich"
++
+ #: src/core/mutter.c:39
+ #, c-format
+ msgid ""
+ "mutter %s\n"
+-"Copyright (C) 2001-%d Havoc Pennington, Red Hat, Inc., and others\n"
++"Copyright © 2001-%d Havoc Pennington, Red Hat, Inc., and others\n"
+ "This is free software; see the source for copying conditions.\n"
+ "There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A "
+ "PARTICULAR PURPOSE.\n"
+@@ -558,34 +413,34 @@ msgstr ""
+ msgid "Workspace %d"
+ msgstr "Rum-obrach %d"
+ 
+-#: src/core/screen.c:521
++#: src/core/screen.c:583
+ #, c-format
+ msgid ""
+-"Display \"%s\" already has a window manager; try using the --replace option "
+-"to replace the current window manager."
++"Display “%s” already has a window manager; try using the --replace option to "
++"replace the current window manager."
+ msgstr ""
+ 
+-#: src/core/screen.c:606
++#: src/core/screen.c:668
+ #, c-format
+-msgid "Screen %d on display '%s' is invalid\n"
++msgid "Screen %d on display “%s” is invalid\n"
+ msgstr ""
+ 
+ #: src/core/util.c:120
+ msgid "Mutter was compiled without support for verbose mode\n"
+ msgstr ""
+ 
+-#: src/wayland/meta-wayland-tablet-pad.c:595
++#: src/wayland/meta-wayland-tablet-pad.c:563
+ #, c-format
+ msgid "Mode Switch: Mode %d"
+ msgstr "Suidse nam modh: Modh %d"
+ 
+ #: src/x11/session.c:1815
+ msgid ""
+-"These windows do not support &quot;save current setup&quot; and will have to "
+-"be restarted manually next time you log in."
++"These windows do not support “save current setup” and will have to be "
++"restarted manually next time you log in."
+ msgstr ""
+ 
+-#: src/x11/window-props.c:548
++#: src/x11/window-props.c:559
+ #, c-format
+ msgid "%s (on %s)"
+ msgstr "%s (air %s)"
+-- 
+2.17.0
 

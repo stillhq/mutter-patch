@@ -7,7 +7,7 @@
 
 Name:          mutter
 Version:       3.26.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -17,7 +17,7 @@ Source0:       http://download.gnome.org/sources/%{name}/3.26/%{name}-%{version}
 
 Patch0:        startup-notification.patch
 
-Patch1:        gnome-3-26-cde545462.patch
+Patch1:        gnome-3-26-543d031a5.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -189,6 +189,9 @@ glib-compile-schemas %{_datadir}/glib-2.0/schemas &> /dev/null || :
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Apr 11 2018 Adam Williamson <awilliam@redhat.com> - 3.26.2-3
+- Update to upstream gnome-3-26 commit 543d031a5 for more fixes
+
 * Wed Dec  6 2017 Rui Matos <rmatos@redhat.com> - 3.26.2-2
 - Update to upstream gnome-3-26 commit cde545462 for multiple fixes
 
