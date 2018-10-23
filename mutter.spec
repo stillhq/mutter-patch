@@ -7,7 +7,7 @@
 
 Name:          mutter
 Version:       3.30.1
-Release:       4%{?dist}
+Release:       5%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -26,6 +26,9 @@ Patch3:        0002-shaped-texture-Clean-up-texture-regions.patch
 
 # Backport work-around for hangul text input bug (rhbz#1632981)
 Patch4:        0001-wayland-Defer-text_input.done-on-an-idle.patch
+
+# Backport Wayland text-input crash fix (rhbz#1642058)
+Patch5:        0001-wayland-text-input-Ignore-text-input-state-commit-wh.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -191,6 +194,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter/tests
 
 %changelog
+* Tue Oct 23 2018 Jonas Ådahl <jadahl@redhat.com> - 3.30.1-5
+- Backport work-around for hangul text input bug (rhbz#1642058)
+
 * Mon Oct 22 2018 Jonas Ådahl <jadahl@redhat.com> - 3.30.1-4
 - Backport work-around for hangul text input bug (rhbz#1632981)
 
