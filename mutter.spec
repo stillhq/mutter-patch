@@ -6,8 +6,8 @@
 %global pipewire_version 0.2.2
 
 Name:          mutter
-Version:       3.30.1
-Release:       5%{?dist}
+Version:       3.30.2
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -19,13 +19,6 @@ Patch0:        startup-notification.patch
 
 # Fix disabled monitor when laptop lid is closed (rhbz#1638444)
 Patch1:        0001-monitor-manager-Don-t-use-switch-config-when-ensurin.patch
-
-# Backport memory leak fixes (rhbz#1641254)
-Patch2:        0001-constraints-Make-current-placement-rule-stack-alloca.patch
-Patch3:        0002-shaped-texture-Clean-up-texture-regions.patch
-
-# Backport work-around for hangul text input bug (rhbz#1632981)
-Patch4:        0001-wayland-Defer-text_input.done-on-an-idle.patch
 
 # Backport Wayland text-input crash fix (rhbz#1642058)
 Patch5:        0001-wayland-text-input-Ignore-text-input-state-commit-wh.patch
@@ -194,6 +187,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.30.2-1
+- Update to 3.30.2
+
 * Tue Oct 23 2018 Jonas Ådahl <jadahl@redhat.com> - 3.30.1-5
 - Backport work-around for hangul text input bug (rhbz#1642058)
 
