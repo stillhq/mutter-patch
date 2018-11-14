@@ -7,7 +7,7 @@
 
 Name:          mutter
 Version:       3.30.2
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -17,8 +17,11 @@ Source0:       http://download.gnome.org/sources/%{name}/3.30/%{name}-%{version}
 
 Patch0:        startup-notification.patch
 
+# Work-around for OpenJDK's compliance test
+Patch1:        0001-window-actor-Special-case-shaped-Java-windows.patch
+
 # Fix disabled monitor when laptop lid is closed (rhbz#1638444)
-Patch1:        0001-monitor-manager-Don-t-use-switch-config-when-ensurin.patch
+Patch2:        0001-monitor-manager-Don-t-use-switch-config-when-ensurin.patch
 
 # Backport Wayland text-input crash fix (rhbz#1642058)
 Patch5:        0001-wayland-text-input-Ignore-text-input-state-commit-wh.patch
@@ -187,6 +190,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter/tests
 
 %changelog
+* Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.31.2-2
+- Include workaround for OpenJDK's compliance test
+
 * Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.30.2-1
 - Update to 3.30.2
 
