@@ -7,7 +7,7 @@
 
 Name:          mutter
 Version:       3.30.2
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -25,6 +25,8 @@ Patch2:        0001-monitor-manager-Don-t-use-switch-config-when-ensurin.patch
 
 # Backport Wayland text-input crash fix (rhbz#1642058)
 Patch5:        0001-wayland-text-input-Ignore-text-input-state-commit-wh.patch
+
+Patch6:        0001-renderer-native-add-missing-eglTerminate-in-EGLDevic.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -190,7 +192,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter/tests
 
 %changelog
-* Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.31.2-2
+* Tue Jun 25 2019 Florian Müllner <fmuellner@redhat.com> - 3.30.2-3
+- Add missing elgTerminal() call in EGLDevice error path
+
+* Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.30.2-2
 - Include workaround for OpenJDK's compliance test
 
 * Wed Nov 14 2018 Florian Müllner <fmuellner@redhat.com> - 3.30.2-1
