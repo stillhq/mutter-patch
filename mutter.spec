@@ -27,6 +27,9 @@ Patch1:        0001-renderer-native-add-missing-eglTerminate-in-EGLDevic.patch
 # https://gitlab.gnome.org/GNOME/mutter/merge_requests/655
 Patch2:        egl-surface-destruction-and-hotplug-abort-fix.patch
 
+# Backport crash resiliance for late activation (#1754148)
+Patch3:        0001-window-Emit-an-error-and-return-when-trying-to-activ.patch
+
 BuildRequires: chrpath
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -168,6 +171,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Fri Sep 27 2019 Jonas Ådahl <jadahl@redhat.com> - 3.32.2-4
+- Backport crash resiliance for late activation
+  Resolves: #1754148
+
 * Fri Jun 28 2019 Jonas Ådahl <jadahl@redhat.com> - 3.32.2-3
 - Backport EGL surface destruction order fix
 - Backport hot plug abort fix
