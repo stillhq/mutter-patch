@@ -8,7 +8,7 @@
 
 Name:          mutter
 Version:       3.34.6
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -27,6 +27,9 @@ Patch2:        0002-window-xwayland-Add-Xwayland-fullscreen-games-workar.patch
 
 # Mitigate crash on tear down. (rhbz#1770089, rhbz#1770089)
 Patch3:        0001-compositor-Guard-against-untimely-calls.patch
+
+# Don't crash on heavy touchscreen usage in X11 session (#1788953, #1788548, #1780858)
+Patch4:        0001-stage-x11-Check-that-message-is-WM_PROTOCOLS-before-.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -171,6 +174,12 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Tue Jun 16 2020 Jonas Ådahl <jadahl@redhat.com> - 3.34.6-2
+- Don't crash on heavy touchscreen usage in X11 session
+  Resolves: #1788953
+  Resolves: #1788548
+  Resolves: #1780858
+
 * Thu Apr 30 2020 Florian Müllner <fmuellner@redhat.com> - 3.34.6-1
 - Update to 3.34.6
 
