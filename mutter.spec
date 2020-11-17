@@ -8,7 +8,7 @@
 
 Name:          mutter
 Version:       3.34.6
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -30,6 +30,9 @@ Patch3:        0001-compositor-Guard-against-untimely-calls.patch
 
 # Don't crash on heavy touchscreen usage in X11 session (#1788953, #1788548, #1780858)
 Patch4:        0001-stage-x11-Check-that-message-is-WM_PROTOCOLS-before-.patch
+
+Patch5:        0001-meson_options-Use-libGLESv2.so.2-for-COGL_DRIVER-gle.patch
+Patch6:        0001-backend-x11-Reintroduce-XInitThreads.patch
 
 BuildRequires: chrpath
 BuildRequires: pango-devel
@@ -174,6 +177,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Tue Nov 17 2020 Jonas Ådahl <jadahl@redhat.com> - 3.34.6-3
+- Backport X11 threading and cogl driver selection fix
+  Related: #1762151
+
 * Tue Jun 16 2020 Jonas Ådahl <jadahl@redhat.com> - 3.34.6-2
 - Don't crash on heavy touchscreen usage in X11 session
   Resolves: #1788953
