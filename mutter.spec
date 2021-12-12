@@ -9,8 +9,8 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:          mutter
-Version:       41.1
-Release:       2%{?dist}
+Version:       41.2
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -25,9 +25,6 @@ Patch1:        0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
 
 # Workaround for RHBZ#1936991 (blocks atomic KMS on "tegra" driver)
 Patch2:        0001-Test-deny-atomic-KMS-for-tegra-RHBZ-1936991.patch
-
-# Patches that landed upstream after 41.1
-Patch3:        patches-atfer-41.1.patch
 
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -177,6 +174,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Sun Dec 12 2021 Florian Müllner <fmuellner@redhat.com> - 41.2-1
+- Update to 41.2
+
 * Fri Dec 10 2021 Jonas Ådahl <jadahl@redhat.com> - 41.1-2
 - Backport patches after 41.1
 
