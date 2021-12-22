@@ -1,0 +1,1465 @@
+From 99b0b78ea01e032df50256d939d3c332bb11e6d2 Mon Sep 17 00:00:00 2001
+From: Carlos Garnacho <carlosg@gnome.org>
+Date: Thu, 9 Dec 2021 12:47:04 +0100
+Subject: [PATCH 01/13] wayland: Check keyboard serials for activation
+
+We are using internal API that has the benefit of checking that the
+focus surface still matches, but has the drawback that it does not
+check the MetaWaylandKeyboard state.
+
+In order to fix this, look for keyboard focus and serial matches
+specifically when triggering activation.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2148>
+
+
+(cherry picked from commit d2998a8e4142c1e5294a887eb134d0ac41445d6a)
+---
+ src/wayland/meta-wayland-activation.c | 31 +++++++++++++++++++++------
+ src/wayland/meta-wayland-keyboard.c   | 12 +++++++++++
+ src/wayland/meta-wayland-keyboard.h   |  3 +++
+ 3 files changed, 40 insertions(+), 6 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-activation.c b/src/wayland/meta-wayland-activation.c
+index 1983566c1c1b..d30fbd3d650f 100644
+--- a/src/wayland/meta-wayland-activation.c
++++ b/src/wayland/meta-wayland-activation.c
+@@ -259,6 +259,30 @@ activation_get_activation_token (struct wl_client   *client,
+                                                      id);
+ }
+ 
++static gboolean
++token_can_activate (MetaXdgActivationToken *token)
++{
++  MetaWaylandSeat *seat;
++
++  if (!token->seat)
++    return FALSE;
++  if (!token->surface)
++    return FALSE;
++
++  seat = token->seat;
++
++  if (seat->keyboard &&
++      meta_wayland_keyboard_can_grab_surface (seat->keyboard,
++                                              token->surface,
++                                              token->serial))
++    return TRUE;
++
++  return meta_wayland_seat_get_grab_info (seat,
++                                          token->surface,
++                                          token->serial,
++                                          FALSE, NULL, NULL);
++}
++
+ static void
+ activation_activate (struct wl_client   *client,
+                      struct wl_resource *resource,
+@@ -278,12 +302,7 @@ activation_activate (struct wl_client   *client,
+   if (!token)
+     return;
+ 
+-  if (token->seat &&
+-      token->surface &&
+-      meta_wayland_seat_get_grab_info (token->seat,
+-                                       token->surface,
+-                                       token->serial,
+-                                       FALSE, NULL, NULL))
++  if (token_can_activate (token))
+     {
+       uint32_t timestamp;
+       int32_t workspace_idx;
+diff --git a/src/wayland/meta-wayland-keyboard.c b/src/wayland/meta-wayland-keyboard.c
+index 836939c9d300..114802e6b751 100644
+--- a/src/wayland/meta-wayland-keyboard.c
++++ b/src/wayland/meta-wayland-keyboard.c
+@@ -816,6 +816,18 @@ meta_wayland_keyboard_create_new_resource (MetaWaylandKeyboard *keyboard,
+     }
+ }
+ 
++gboolean
++meta_wayland_keyboard_can_grab_surface (MetaWaylandKeyboard *keyboard,
++                                        MetaWaylandSurface  *surface,
++                                        uint32_t             serial)
++{
++  if (keyboard->focus_surface != surface)
++    return FALSE;
++
++  return (keyboard->focus_serial == serial ||
++          meta_wayland_keyboard_can_popup (keyboard, serial));
++}
++
+ gboolean
+ meta_wayland_keyboard_can_popup (MetaWaylandKeyboard *keyboard,
+                                  uint32_t             serial)
+diff --git a/src/wayland/meta-wayland-keyboard.h b/src/wayland/meta-wayland-keyboard.h
+index ac57d76774fb..6cce803ff179 100644
+--- a/src/wayland/meta-wayland-keyboard.h
++++ b/src/wayland/meta-wayland-keyboard.h
+@@ -130,6 +130,9 @@ void meta_wayland_keyboard_create_new_resource (MetaWaylandKeyboard *keyboard,
+                                                 struct wl_resource  *seat_resource,
+                                                 uint32_t id);
+ 
++gboolean meta_wayland_keyboard_can_grab_surface (MetaWaylandKeyboard *keyboard,
++                                                 MetaWaylandSurface  *surface,
++                                                 uint32_t             serial);
+ gboolean meta_wayland_keyboard_can_popup (MetaWaylandKeyboard *keyboard,
+                                           uint32_t             serial);
+ 
+-- 
+2.33.1
+
+
+From 4913578bbf15fa445d680bb78333d76396301181 Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@posteo.de>
+Date: Sun, 19 Dec 2021 23:42:57 +0100
+Subject: [PATCH 02/13] surface-actor: Fix unobscurred_fraction calculation
+
+This calculation wrongly applied a `x2 - x1` pattern.
+
+Closes https://gitlab.gnome.org/GNOME/mutter/-/issues/1971
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2169>
+
+
+(cherry picked from commit 6204769fdb8a048ee23f49be0ca532f8ff1d557a)
+---
+ src/compositor/meta-surface-actor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/compositor/meta-surface-actor.c b/src/compositor/meta-surface-actor.c
+index 31442b404204..c2bf6696a209 100644
+--- a/src/compositor/meta-surface-actor.c
++++ b/src/compositor/meta-surface-actor.c
+@@ -499,7 +499,7 @@ meta_surface_actor_is_obscured_on_stage_view (MetaSurfaceActor *self,
+           cairo_rectangle_int_t rect;
+ 
+           cairo_region_get_rectangle (intersection_region, i, &rect);
+-          intersection_size += (rect.width - rect.x) * (rect.height - rect.x);
++          intersection_size += rect.width * rect.height;
+         }
+       cairo_region_destroy (intersection_region);
+ 
+-- 
+2.33.1
+
+
+From 5d0c26631b3f0d163a89bc914f02cba385558be2 Mon Sep 17 00:00:00 2001
+From: Olivier Fourdan <ofourdan@redhat.com>
+Date: Fri, 10 Dec 2021 10:57:29 +0100
+Subject: [PATCH 03/13] cursor-renderer/native: Add a means to disable HW
+ cursors
+
+When dealing with a faulty hardware or bugs in the driver, it might be
+interesting to force the use of software cursors for debugging purposes.
+
+Add a debug environment variable MUTTER_DEBUG_DISABLE_HW_CURSORS to
+disable hardware cursors and force using software cursors.
+
+Closes: https://gitlab.gnome.org/GNOME/mutter/-/issues/2046
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2150>
+
+
+(cherry picked from commit 56939abd2f1691eea9edf85cb715ebf275944e7e)
+---
+ src/backends/native/meta-cursor-renderer-native.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/backends/native/meta-cursor-renderer-native.c b/src/backends/native/meta-cursor-renderer-native.c
+index 3143d2512be9..d9e4a7e1d71f 100644
+--- a/src/backends/native/meta-cursor-renderer-native.c
++++ b/src/backends/native/meta-cursor-renderer-native.c
+@@ -1864,7 +1864,10 @@ meta_cursor_renderer_native_new (MetaBackend        *backend,
+ 
+   priv->backend = backend;
+ 
+-  init_hw_cursor_support (cursor_renderer_native);
++  if (g_strcmp0 (getenv ("MUTTER_DEBUG_DISABLE_HW_CURSORS"), "1"))
++    init_hw_cursor_support (cursor_renderer_native);
++  else
++    g_message ("Disabling hardware cursors because MUTTER_DEBUG_DISABLE_HW_CURSORS is set");
+ 
+   return cursor_renderer_native;
+ }
+-- 
+2.33.1
+
+
+From 75689b6926704c3f15b53097ba5efd02d8829dfb Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@collabora.com>
+Date: Sat, 18 Dec 2021 18:38:21 +0100
+Subject: [PATCH 04/13] wayland/surface: Switch order for calculating surface
+ damage
+
+Process surface damage in the right order, simplifying the
+calculations.
+
+No functional change intended.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2168>
+
+(cherry picked from commit f4717d0ac51625d271f3a8cdc6804fa9461bc927)
+---
+ src/wayland/meta-wayland-surface.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index 630c76c8aa9d..8be5926d6cbb 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -355,30 +355,28 @@ surface_process_damage (MetaWaylandSurface *surface,
+ 
+   /* The damage region must be in the same coordinate space as the buffer,
+    * i.e. scaled with surface->scale. */
+-  scaled_region = meta_region_scale (surface_region, surface->scale);
+   if (surface->viewport.has_src_rect)
+     {
+       src_rect = (graphene_rect_t) {
+-        .origin.x = surface->viewport.src_rect.origin.x * surface->scale,
+-        .origin.y = surface->viewport.src_rect.origin.y * surface->scale,
+-        .size.width = surface->viewport.src_rect.size.width * surface->scale,
+-        .size.height = surface->viewport.src_rect.size.height * surface->scale
++        .origin.x = surface->viewport.src_rect.origin.x,
++        .origin.y = surface->viewport.src_rect.origin.y,
++        .size.width = surface->viewport.src_rect.size.width,
++        .size.height = surface->viewport.src_rect.size.height
+       };
+     }
+   else
+     {
+       src_rect = (graphene_rect_t) {
+-        .size.width = surface_rect.width * surface->scale,
+-        .size.height = surface_rect.height * surface->scale,
++        .size.width = surface_rect.width,
++        .size.height = surface_rect.height
+       };
+     }
+-  viewport_region = meta_region_crop_and_scale (scaled_region,
++  viewport_region = meta_region_crop_and_scale (surface_region,
+                                                 &src_rect,
+-                                                surface_rect.width *
+-                                                surface->scale,
+-                                                surface_rect.height *
+-                                                surface->scale);
+-  transformed_region = meta_region_transform (viewport_region,
++                                                surface_rect.width,
++                                                surface_rect.height);
++  scaled_region = meta_region_scale (viewport_region, surface->scale);
++  transformed_region = meta_region_transform (scaled_region,
+                                               surface->buffer_transform,
+                                               buffer_rect.width,
+                                               buffer_rect.height);
+-- 
+2.33.1
+
+
+From e7570757c4950f1f81db8d099c412e5ab1f2985d Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@collabora.com>
+Date: Sat, 18 Dec 2021 21:45:52 +0100
+Subject: [PATCH 05/13] wayland/surface: Use correct default viewport for
+ surface damage
+
+If no viewport is set, the neutral viewport is the surface size
+without viewport destination size applied - i.e. transform and
+scale applied to the buffer size. Change it accordingly, giving
+us the same values we'd return in `get_width` in this case.
+
+As result, this only changes cases where a viewport destination
+size but no viewport source rectangle is set.
+
+The change fixes exactly such cases, e.g. the Gstreamer Wayland
+sink. Can be tested with: `gst-play-1.0 --videosink=waylandsink`.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2168>
+
+(cherry picked from commit c1668116959664f04e509130e76a18d55429ca65)
+---
+ src/wayland/meta-wayland-surface.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index 8be5926d6cbb..5f0ff3881b88 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -366,9 +366,22 @@ surface_process_damage (MetaWaylandSurface *surface,
+     }
+   else
+     {
++      int width, height;
++
++      if (meta_monitor_transform_is_rotated (surface->buffer_transform))
++        {
++          width = get_buffer_height (surface);
++          height = get_buffer_width (surface);
++        }
++      else
++        {
++          width = get_buffer_width (surface);
++          height = get_buffer_height (surface);
++        }
++
+       src_rect = (graphene_rect_t) {
+-        .size.width = surface_rect.width,
+-        .size.height = surface_rect.height
++        .size.width = width / surface->scale,
++        .size.height = height / surface->scale
+       };
+     }
+   viewport_region = meta_region_crop_and_scale (surface_region,
+-- 
+2.33.1
+
+
+From 7b64c159a00f90bbafec2be0667dc979cda5c6fb Mon Sep 17 00:00:00 2001
+From: Robert Mader <robert.mader@collabora.com>
+Date: Sat, 18 Dec 2021 22:00:41 +0100
+Subject: [PATCH 06/13] wayland/surface: Do not uncoditionally process surface
+ damage
+
+Most clients nowadays switched to buffer damage, most notably Mesa
+and Xwayland. Thus lets avoid the extra cost of allocating three
+`cairo_region_t`s and doing some calculations.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2168>
+
+(cherry picked from commit c498ae337f57a67c6e678d549cf9a8070c32f251)
+---
+ src/wayland/meta-wayland-surface.c | 111 +++++++++++++++--------------
+ 1 file changed, 58 insertions(+), 53 deletions(-)
+
+diff --git a/src/wayland/meta-wayland-surface.c b/src/wayland/meta-wayland-surface.c
+index 5f0ff3881b88..3802ae298608 100644
+--- a/src/wayland/meta-wayland-surface.c
++++ b/src/wayland/meta-wayland-surface.c
+@@ -324,12 +324,7 @@ surface_process_damage (MetaWaylandSurface *surface,
+                         cairo_region_t     *buffer_region)
+ {
+   MetaWaylandBuffer *buffer = meta_wayland_surface_get_buffer (surface);
+-  cairo_rectangle_int_t surface_rect;
+   cairo_rectangle_int_t buffer_rect;
+-  cairo_region_t *scaled_region;
+-  cairo_region_t *transformed_region;
+-  cairo_region_t *viewport_region;
+-  graphene_rect_t src_rect;
+   MetaSurfaceActor *actor;
+ 
+   /* If the client destroyed the buffer it attached before committing, but
+@@ -344,59 +339,73 @@ surface_process_damage (MetaWaylandSurface *surface,
+     .height = get_buffer_height (surface),
+   };
+ 
+-  /* Intersect the damage region with the surface region before scaling in
+-   * order to avoid integer overflow when scaling a damage region is too large
+-   * (for example INT32_MAX which mesa passes). */
+-  surface_rect = (cairo_rectangle_int_t) {
+-    .width = meta_wayland_surface_get_width (surface),
+-    .height = meta_wayland_surface_get_height (surface),
+-  };
+-  cairo_region_intersect_rectangle (surface_region, &surface_rect);
+-
+-  /* The damage region must be in the same coordinate space as the buffer,
+-   * i.e. scaled with surface->scale. */
+-  if (surface->viewport.has_src_rect)
++  if (!cairo_region_is_empty (surface_region))
+     {
+-      src_rect = (graphene_rect_t) {
+-        .origin.x = surface->viewport.src_rect.origin.x,
+-        .origin.y = surface->viewport.src_rect.origin.y,
+-        .size.width = surface->viewport.src_rect.size.width,
+-        .size.height = surface->viewport.src_rect.size.height
++      cairo_rectangle_int_t surface_rect;
++      cairo_region_t *scaled_region;
++      cairo_region_t *transformed_region;
++      cairo_region_t *viewport_region;
++      graphene_rect_t src_rect;
++
++      /* Intersect the damage region with the surface region before scaling in
++       * order to avoid integer overflow when scaling a damage region is too
++       * large (for example INT32_MAX which mesa passes). */
++      surface_rect = (cairo_rectangle_int_t) {
++        .width = meta_wayland_surface_get_width (surface),
++        .height = meta_wayland_surface_get_height (surface),
+       };
+-    }
+-  else
+-    {
+-      int width, height;
++      cairo_region_intersect_rectangle (surface_region, &surface_rect);
+ 
+-      if (meta_monitor_transform_is_rotated (surface->buffer_transform))
++      /* The damage region must be in the same coordinate space as the buffer,
++       * i.e. scaled with surface->scale. */
++      if (surface->viewport.has_src_rect)
+         {
+-          width = get_buffer_height (surface);
+-          height = get_buffer_width (surface);
++          src_rect = (graphene_rect_t) {
++            .origin.x = surface->viewport.src_rect.origin.x,
++            .origin.y = surface->viewport.src_rect.origin.y,
++            .size.width = surface->viewport.src_rect.size.width,
++            .size.height = surface->viewport.src_rect.size.height
++          };
+         }
+       else
+         {
+-          width = get_buffer_width (surface);
+-          height = get_buffer_height (surface);
+-        }
++          int width, height;
+ 
+-      src_rect = (graphene_rect_t) {
+-        .size.width = width / surface->scale,
+-        .size.height = height / surface->scale
+-      };
++          if (meta_monitor_transform_is_rotated (surface->buffer_transform))
++            {
++              width = get_buffer_height (surface);
++              height = get_buffer_width (surface);
++            }
++          else
++            {
++              width = get_buffer_width (surface);
++              height = get_buffer_height (surface);
++            }
++
++          src_rect = (graphene_rect_t) {
++            .size.width = width / surface->scale,
++            .size.height = height / surface->scale
++          };
++        }
++      viewport_region = meta_region_crop_and_scale (surface_region,
++                                                    &src_rect,
++                                                    surface_rect.width,
++                                                    surface_rect.height);
++      scaled_region = meta_region_scale (viewport_region, surface->scale);
++      transformed_region = meta_region_transform (scaled_region,
++                                                  surface->buffer_transform,
++                                                  buffer_rect.width,
++                                                  buffer_rect.height);
++
++      /* Now add the scaled, cropped and transformed damage region to the
++       * buffer damage. Buffer damage is already in the correct coordinate
++       * space. */
++      cairo_region_union (buffer_region, transformed_region);
++
++      cairo_region_destroy (viewport_region);
++      cairo_region_destroy (scaled_region);
++      cairo_region_destroy (transformed_region);
+     }
+-  viewport_region = meta_region_crop_and_scale (surface_region,
+-                                                &src_rect,
+-                                                surface_rect.width,
+-                                                surface_rect.height);
+-  scaled_region = meta_region_scale (viewport_region, surface->scale);
+-  transformed_region = meta_region_transform (scaled_region,
+-                                              surface->buffer_transform,
+-                                              buffer_rect.width,
+-                                              buffer_rect.height);
+-
+-  /* Now add the scaled, cropped and transformed damage region to the
+-   * buffer damage. Buffer damage is already in the correct coordinate space. */
+-  cairo_region_union (buffer_region, transformed_region);
+ 
+   cairo_region_intersect_rectangle (buffer_region, &buffer_rect);
+ 
+@@ -418,10 +427,6 @@ surface_process_damage (MetaWaylandSurface *surface,
+                                              rect.width, rect.height);
+         }
+     }
+-
+-  cairo_region_destroy (viewport_region);
+-  cairo_region_destroy (scaled_region);
+-  cairo_region_destroy (transformed_region);
+ }
+ 
+ MetaWaylandBuffer *
+-- 
+2.33.1
+
+
+From 8a71523393c74e882587172c7820c46b9390208b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Thu, 16 Sep 2021 11:12:08 +0200
+Subject: [PATCH 07/13] backend: Get the default seat directly
+
+In various places we retrieved the default seat from the ClutterBackend.
+All the clutter backends implement this by calling
+meta_backend_get_default_seat() which will then return
+MetaBackendPrivate::default_seat.
+
+Lets avoid this by fetching the default seat directly.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2002>
+---
+ src/backends/meta-backend.c | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
+index 651cd592f7f3..f4fceeb4eeb3 100644
+--- a/src/backends/meta-backend.c
++++ b/src/backends/meta-backend.c
+@@ -286,7 +286,7 @@ reset_pointer_position (MetaBackend *backend)
+ {
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+   MetaMonitorManager *monitor_manager = priv->monitor_manager;
+-  ClutterSeat *seat = clutter_backend_get_default_seat (priv->clutter_backend);
++  ClutterSeat *seat = priv->default_seat;
+   MetaLogicalMonitor *primary;
+ 
+   primary =
+@@ -321,7 +321,7 @@ static void
+ update_cursors (MetaBackend *backend)
+ {
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+-  ClutterSeat *seat = clutter_backend_get_default_seat (priv->clutter_backend);
++  ClutterSeat *seat = priv->default_seat;
+   MetaCursorRenderer *cursor_renderer;
+   ClutterInputDevice *pointer, *device;
+   GList *devices, *l;
+@@ -352,7 +352,7 @@ meta_backend_monitors_changed (MetaBackend *backend)
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+   MetaMonitorManager *monitor_manager =
+     meta_backend_get_monitor_manager (backend);
+-  ClutterSeat *seat = clutter_backend_get_default_seat (priv->clutter_backend);
++  ClutterSeat *seat = priv->default_seat;
+   ClutterInputDevice *device = clutter_seat_get_pointer (seat);
+   graphene_point_t point;
+ 
+@@ -509,7 +509,7 @@ static void
+ on_stage_shown_cb (MetaBackend *backend)
+ {
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+-  ClutterSeat *seat = clutter_backend_get_default_seat (priv->clutter_backend);
++  ClutterSeat *seat = priv->default_seat;
+   g_autoptr (GList) devices = NULL;
+   const GList *l;
+ 
+@@ -535,7 +535,7 @@ static void
+ meta_backend_real_post_init (MetaBackend *backend)
+ {
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+-  ClutterSeat *seat = clutter_backend_get_default_seat (priv->clutter_backend);
++  ClutterSeat *seat = priv->default_seat;
+   MetaInputSettings *input_settings;
+ 
+   priv->stage = meta_stage_new (backend);
+@@ -1225,10 +1225,8 @@ meta_backend_get_cursor_renderer (MetaBackend *backend)
+ {
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+   ClutterInputDevice *pointer;
+-  ClutterSeat *seat;
+ 
+-  seat = clutter_backend_get_default_seat (priv->clutter_backend);
+-  pointer = clutter_seat_get_pointer (seat);
++  pointer = clutter_seat_get_pointer (priv->default_seat);
+ 
+   return meta_backend_get_cursor_renderer_for_device (backend, pointer);
+ }
+-- 
+2.33.1
+
+
+From 7e7067421a20bab6bae105cd34e96fa8c797c932 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Mon, 15 Nov 2021 14:24:53 +0100
+Subject: [PATCH 08/13] cursor-sprite: Register all cursor sprites with the
+ cursor tracker
+
+This will later be used to invalidate GPU state when closing device
+nodes.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2147>
+(cherry picked from commit 25ed64b61decc3e20bca6cd06f14287f19a8e626)
+---
+ src/backends/meta-cursor-sprite-xcursor.c     |  7 +-
+ src/backends/meta-cursor-sprite-xcursor.h     |  4 +-
+ src/backends/meta-cursor-tracker-private.h    |  8 +++
+ src/backends/meta-cursor-tracker.c            | 31 +++++++++
+ src/backends/meta-cursor.c                    | 65 +++++++++++++++++++
+ .../x11/cm/meta-cursor-sprite-xfixes.c        |  6 +-
+ .../x11/cm/meta-cursor-sprite-xfixes.h        |  5 +-
+ src/backends/x11/meta-cursor-tracker-x11.c    |  6 +-
+ src/core/display.c                            |  2 +-
+ src/wayland/meta-cursor-sprite-wayland.c      |  7 +-
+ src/wayland/meta-cursor-sprite-wayland.h      |  3 +-
+ src/wayland/meta-wayland-cursor-surface.c     |  6 +-
+ src/wayland/meta-wayland-tablet-tool.c        |  5 +-
+ 13 files changed, 141 insertions(+), 14 deletions(-)
+
+diff --git a/src/backends/meta-cursor-sprite-xcursor.c b/src/backends/meta-cursor-sprite-xcursor.c
+index 5284f28eaa7c..947440b9ded8 100644
+--- a/src/backends/meta-cursor-sprite-xcursor.c
++++ b/src/backends/meta-cursor-sprite-xcursor.c
+@@ -326,11 +326,14 @@ meta_cursor_sprite_xcursor_realize_texture (MetaCursorSprite *sprite)
+ }
+ 
+ MetaCursorSpriteXcursor *
+-meta_cursor_sprite_xcursor_new (MetaCursor cursor)
++meta_cursor_sprite_xcursor_new (MetaCursor         cursor,
++                                MetaCursorTracker *cursor_tracker)
+ {
+   MetaCursorSpriteXcursor *sprite_xcursor;
+ 
+-  sprite_xcursor = g_object_new (META_TYPE_CURSOR_SPRITE_XCURSOR, NULL);
++  sprite_xcursor = g_object_new (META_TYPE_CURSOR_SPRITE_XCURSOR,
++                                 "cursor-tracker", cursor_tracker,
++                                 NULL);
+   sprite_xcursor->cursor = cursor;
+ 
+   return sprite_xcursor;
+diff --git a/src/backends/meta-cursor-sprite-xcursor.h b/src/backends/meta-cursor-sprite-xcursor.h
+index dbc927484d56..dcb74817c067 100644
+--- a/src/backends/meta-cursor-sprite-xcursor.h
++++ b/src/backends/meta-cursor-sprite-xcursor.h
+@@ -23,12 +23,14 @@
+ #include <X11/Xcursor/Xcursor.h>
+ 
+ #include "backends/meta-cursor.h"
++#include "meta/types.h"
+ 
+ #define META_TYPE_CURSOR_SPRITE_XCURSOR meta_cursor_sprite_xcursor_get_type ()
+ G_DECLARE_FINAL_TYPE (MetaCursorSpriteXcursor, meta_cursor_sprite_xcursor,
+                       META, CURSOR_SPRITE_XCURSOR, MetaCursorSprite)
+ 
+-MetaCursorSpriteXcursor * meta_cursor_sprite_xcursor_new (MetaCursor cursor);
++MetaCursorSpriteXcursor * meta_cursor_sprite_xcursor_new (MetaCursor         cursor,
++                                                          MetaCursorTracker *cursor_tracker);
+ 
+ void meta_cursor_sprite_xcursor_set_theme_scale (MetaCursorSpriteXcursor *sprite_xcursor,
+                                                  int                      scale);
+diff --git a/src/backends/meta-cursor-tracker-private.h b/src/backends/meta-cursor-tracker-private.h
+index 2d8d3804287b..ab4b065718df 100644
+--- a/src/backends/meta-cursor-tracker-private.h
++++ b/src/backends/meta-cursor-tracker-private.h
+@@ -53,4 +53,12 @@ void meta_cursor_tracker_notify_cursor_changed (MetaCursorTracker *tracker);
+ 
+ void meta_cursor_tracker_destroy (MetaCursorTracker *tracker);
+ 
++void meta_cursor_tracker_register_cursor_sprite (MetaCursorTracker *tracker,
++                                                 MetaCursorSprite  *sprite);
++
++void meta_cursor_tracker_unregister_cursor_sprite (MetaCursorTracker *tracker,
++                                                   MetaCursorSprite  *sprite);
++
++GList * meta_cursor_tracker_peek_cursor_sprites (MetaCursorTracker *tracker);
++
+ #endif
+diff --git a/src/backends/meta-cursor-tracker.c b/src/backends/meta-cursor-tracker.c
+index 0df4d73cd472..0078fd6d4823 100644
+--- a/src/backends/meta-cursor-tracker.c
++++ b/src/backends/meta-cursor-tracker.c
+@@ -74,6 +74,8 @@ typedef struct _MetaCursorTrackerPrivate
+   MetaCursorSprite *window_cursor;
+ 
+   MetaCursorSprite *root_cursor;
++
++  GList *cursor_sprites;
+ } MetaCursorTrackerPrivate;
+ 
+ G_DEFINE_TYPE_WITH_PRIVATE (MetaCursorTracker, meta_cursor_tracker,
+@@ -531,3 +533,32 @@ meta_cursor_tracker_get_backend (MetaCursorTracker *tracker)
+ 
+   return priv->backend;
+ }
++
++void
++meta_cursor_tracker_register_cursor_sprite (MetaCursorTracker *tracker,
++                                            MetaCursorSprite  *sprite)
++{
++  MetaCursorTrackerPrivate *priv =
++    meta_cursor_tracker_get_instance_private (tracker);
++
++  priv->cursor_sprites = g_list_prepend (priv->cursor_sprites, sprite);
++}
++
++void
++meta_cursor_tracker_unregister_cursor_sprite (MetaCursorTracker *tracker,
++                                              MetaCursorSprite  *sprite)
++{
++  MetaCursorTrackerPrivate *priv =
++    meta_cursor_tracker_get_instance_private (tracker);
++
++  priv->cursor_sprites = g_list_remove (priv->cursor_sprites, sprite);
++}
++
++GList *
++meta_cursor_tracker_peek_cursor_sprites (MetaCursorTracker *tracker)
++{
++  MetaCursorTrackerPrivate *priv =
++    meta_cursor_tracker_get_instance_private (tracker);
++
++  return priv->cursor_sprites;
++}
+diff --git a/src/backends/meta-cursor.c b/src/backends/meta-cursor.c
+index d0fb2ba68685..f8b64a42f314 100644
+--- a/src/backends/meta-cursor.c
++++ b/src/backends/meta-cursor.c
+@@ -24,6 +24,7 @@
+ #include "backends/meta-cursor.h"
+ 
+ #include "backends/meta-backend-private.h"
++#include "backends/meta-cursor-tracker-private.h"
+ #include "cogl/cogl.h"
+ #include "meta/common.h"
+ 
+@@ -37,6 +38,17 @@ enum
+ 
+ static guint signals[LAST_SIGNAL];
+ 
++enum
++{
++  PROP_0,
++
++  PROP_CURSOR_TRACKER,
++
++  N_PROPS
++};
++
++static GParamSpec *obj_props[N_PROPS];
++
+ typedef struct _MetaCursorSpritePrivate
+ {
+   GObject parent;
+@@ -45,6 +57,8 @@ typedef struct _MetaCursorSpritePrivate
+   float texture_scale;
+   MetaMonitorTransform texture_transform;
+   int hot_x, hot_y;
++
++  MetaCursorTracker *cursor_tracker;
+ } MetaCursorSpritePrivate;
+ 
+ G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (MetaCursorSprite,
+@@ -203,6 +217,22 @@ meta_cursor_sprite_init (MetaCursorSprite *sprite)
+   priv->texture_transform = META_MONITOR_TRANSFORM_NORMAL;
+ }
+ 
++static void
++meta_cursor_sprite_constructed (GObject *object)
++{
++  MetaCursorSprite *sprite = META_CURSOR_SPRITE (object);
++  MetaCursorSpritePrivate *priv =
++    meta_cursor_sprite_get_instance_private (sprite);
++
++  g_assert (priv->cursor_tracker);
++
++  meta_cursor_tracker_register_cursor_sprite (priv->cursor_tracker, sprite);
++
++  g_clear_pointer (&priv->texture, cogl_object_unref);
++
++  G_OBJECT_CLASS (meta_cursor_sprite_parent_class)->constructed (object);
++}
++
+ static void
+ meta_cursor_sprite_finalize (GObject *object)
+ {
+@@ -212,15 +242,50 @@ meta_cursor_sprite_finalize (GObject *object)
+ 
+   g_clear_pointer (&priv->texture, cogl_object_unref);
+ 
++  meta_cursor_tracker_unregister_cursor_sprite (priv->cursor_tracker, sprite);
++
+   G_OBJECT_CLASS (meta_cursor_sprite_parent_class)->finalize (object);
+ }
+ 
++static void
++meta_cursor_tracker_set_property (GObject      *object,
++                                  guint         prop_id,
++                                  const GValue *value,
++                                  GParamSpec   *pspec)
++{
++  MetaCursorSprite *sprite = META_CURSOR_SPRITE (object);
++  MetaCursorSpritePrivate *priv =
++    meta_cursor_sprite_get_instance_private (sprite);
++
++  switch (prop_id)
++    {
++    case PROP_CURSOR_TRACKER:
++      priv->cursor_tracker = g_value_get_object (value);
++      break;
++    default:
++      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
++      break;
++    }
++}
++
+ static void
+ meta_cursor_sprite_class_init (MetaCursorSpriteClass *klass)
+ {
+   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+ 
++  object_class->constructed = meta_cursor_sprite_constructed;
+   object_class->finalize = meta_cursor_sprite_finalize;
++  object_class->set_property = meta_cursor_tracker_set_property;
++
++  obj_props[PROP_CURSOR_TRACKER] =
++    g_param_spec_object ("cursor-tracker",
++                         "cursor tracker",
++                         "MetaCursorTracker",
++                         META_TYPE_CURSOR_TRACKER,
++                         G_PARAM_WRITABLE |
++                         G_PARAM_CONSTRUCT_ONLY |
++                         G_PARAM_STATIC_STRINGS);
++  g_object_class_install_properties (object_class, N_PROPS, obj_props);
+ 
+   signals[PREPARE_AT] = g_signal_new ("prepare-at",
+                                       G_TYPE_FROM_CLASS (object_class),
+diff --git a/src/backends/x11/cm/meta-cursor-sprite-xfixes.c b/src/backends/x11/cm/meta-cursor-sprite-xfixes.c
+index 0c524668e0eb..0e5ad13876d9 100644
+--- a/src/backends/x11/cm/meta-cursor-sprite-xfixes.c
++++ b/src/backends/x11/cm/meta-cursor-sprite-xfixes.c
+@@ -102,12 +102,14 @@ meta_cursor_sprite_xfixes_set_property (GObject      *object,
+ }
+ 
+ MetaCursorSpriteXfixes *
+-meta_cursor_sprite_xfixes_new (MetaDisplay  *display,
+-                               GError      **error)
++meta_cursor_sprite_xfixes_new (MetaDisplay        *display,
++                               MetaCursorTracker  *cursor_tracker,
++                               GError            **error)
+ {
+   return g_initable_new (META_TYPE_CURSOR_SPRITE_XFIXES,
+                          NULL, error,
+                          "display", display,
++                         "cursor-tracker", cursor_tracker,
+                          NULL);
+ }
+ 
+diff --git a/src/backends/x11/cm/meta-cursor-sprite-xfixes.h b/src/backends/x11/cm/meta-cursor-sprite-xfixes.h
+index c7073fc2c08e..469d958a2606 100644
+--- a/src/backends/x11/cm/meta-cursor-sprite-xfixes.h
++++ b/src/backends/x11/cm/meta-cursor-sprite-xfixes.h
+@@ -30,7 +30,8 @@ G_DECLARE_FINAL_TYPE (MetaCursorSpriteXfixes,
+                       META, CURSOR_SPRITE_XFIXES,
+                       MetaCursorSprite)
+ 
+-MetaCursorSpriteXfixes * meta_cursor_sprite_xfixes_new (MetaDisplay  *display,
+-                                                        GError      **error);
++MetaCursorSpriteXfixes * meta_cursor_sprite_xfixes_new (MetaDisplay        *display,
++                                                        MetaCursorTracker  *cursor_tracker,
++                                                        GError            **error);
+ 
+ #endif /* META_CURSOR_SPRITE_XFIXES_H */
+diff --git a/src/backends/x11/meta-cursor-tracker-x11.c b/src/backends/x11/meta-cursor-tracker-x11.c
+index 7355f828ea00..e01046d80072 100644
+--- a/src/backends/x11/meta-cursor-tracker-x11.c
++++ b/src/backends/x11/meta-cursor-tracker-x11.c
+@@ -77,12 +77,16 @@ static gboolean
+ ensure_xfixes_cursor (MetaCursorTrackerX11 *tracker_x11)
+ {
+   MetaDisplay *display = meta_get_display ();
++  MetaCursorTracker *cursor_tracker;
+   g_autoptr (GError) error = NULL;
+ 
+   if (tracker_x11->xfixes_cursor)
+     return FALSE;
+ 
+-  tracker_x11->xfixes_cursor = meta_cursor_sprite_xfixes_new (display, &error);
++  cursor_tracker = META_CURSOR_TRACKER (tracker_x11);
++  tracker_x11->xfixes_cursor = meta_cursor_sprite_xfixes_new (display,
++                                                              cursor_tracker,
++                                                              &error);
+   if (!tracker_x11->xfixes_cursor)
+     g_warning ("Failed to create XFIXES cursor: %s", error->message);
+ 
+diff --git a/src/core/display.c b/src/core/display.c
+index 6fe69f4cec39..d7852f34ffe3 100644
+--- a/src/core/display.c
++++ b/src/core/display.c
+@@ -1740,7 +1740,7 @@ meta_display_reload_cursor (MetaDisplay *display)
+   MetaBackend *backend = meta_get_backend ();
+   MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend);
+ 
+-  sprite_xcursor = meta_cursor_sprite_xcursor_new (cursor);
++  sprite_xcursor = meta_cursor_sprite_xcursor_new (cursor, cursor_tracker);
+ 
+   if (meta_is_wayland_compositor ())
+     manage_root_cursor_sprite_scale (display, sprite_xcursor);
+diff --git a/src/wayland/meta-cursor-sprite-wayland.c b/src/wayland/meta-cursor-sprite-wayland.c
+index 7c14960ffbf7..f1a599151c3a 100644
+--- a/src/wayland/meta-cursor-sprite-wayland.c
++++ b/src/wayland/meta-cursor-sprite-wayland.c
+@@ -43,11 +43,14 @@ meta_cursor_sprite_wayland_is_animated (MetaCursorSprite *sprite)
+ }
+ 
+ MetaCursorSpriteWayland *
+-meta_cursor_sprite_wayland_new (MetaWaylandSurface *surface)
++meta_cursor_sprite_wayland_new (MetaWaylandSurface *surface,
++                                MetaCursorTracker  *cursor_tracker)
+ {
+   MetaCursorSpriteWayland *sprite_wayland;
+ 
+-  sprite_wayland = g_object_new (META_TYPE_CURSOR_SPRITE_WAYLAND, NULL);
++  sprite_wayland = g_object_new (META_TYPE_CURSOR_SPRITE_WAYLAND,
++                                 "cursor-tracker", cursor_tracker,
++                                 NULL);
+   sprite_wayland->surface = surface;
+ 
+   return sprite_wayland;
+diff --git a/src/wayland/meta-cursor-sprite-wayland.h b/src/wayland/meta-cursor-sprite-wayland.h
+index 107698f3f931..6beb0b69a398 100644
+--- a/src/wayland/meta-cursor-sprite-wayland.h
++++ b/src/wayland/meta-cursor-sprite-wayland.h
+@@ -28,7 +28,8 @@
+ G_DECLARE_FINAL_TYPE (MetaCursorSpriteWayland, meta_cursor_sprite_wayland,
+                       META, CURSOR_SPRITE_WAYLAND, MetaCursorSprite)
+ 
+-MetaCursorSpriteWayland * meta_cursor_sprite_wayland_new (MetaWaylandSurface *surface);
++MetaCursorSpriteWayland * meta_cursor_sprite_wayland_new (MetaWaylandSurface *surface,
++                                                          MetaCursorTracker  *cursor_tracker);
+ 
+ MetaWaylandBuffer * meta_cursor_sprite_wayland_get_buffer (MetaCursorSpriteWayland *sprite_wayland);
+ 
+diff --git a/src/wayland/meta-wayland-cursor-surface.c b/src/wayland/meta-wayland-cursor-surface.c
+index d1f521818a53..f7763884f1ea 100644
+--- a/src/wayland/meta-wayland-cursor-surface.c
++++ b/src/wayland/meta-wayland-cursor-surface.c
+@@ -245,6 +245,9 @@ meta_wayland_cursor_surface_constructed (GObject *object)
+     META_WAYLAND_SURFACE_ROLE (cursor_surface);
+   MetaWaylandSurface *surface =
+     meta_wayland_surface_role_get_surface (surface_role);
++  MetaWaylandCompositor *compositor = surface->compositor;
++  MetaBackend *backend = meta_context_get_backend (compositor->context);
++  MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend);
+   MetaWaylandBuffer *buffer;
+ 
+   buffer = meta_wayland_surface_get_buffer (surface);
+@@ -257,7 +260,8 @@ meta_wayland_cursor_surface_constructed (GObject *object)
+       meta_wayland_surface_ref_buffer_use_count (surface);
+     }
+ 
+-  priv->cursor_sprite = meta_cursor_sprite_wayland_new (surface);
++  priv->cursor_sprite = meta_cursor_sprite_wayland_new (surface,
++                                                        cursor_tracker);
+   g_signal_connect_object (priv->cursor_sprite,
+                            "prepare-at",
+                            G_CALLBACK (cursor_sprite_prepare_at),
+diff --git a/src/wayland/meta-wayland-tablet-tool.c b/src/wayland/meta-wayland-tablet-tool.c
+index 51e4e7d5d4d8..2b2b1d659864 100644
+--- a/src/wayland/meta-wayland-tablet-tool.c
++++ b/src/wayland/meta-wayland-tablet-tool.c
+@@ -385,6 +385,8 @@ meta_wayland_tablet_tool_new (MetaWaylandTabletSeat  *seat,
+                               ClutterInputDevice     *device,
+                               ClutterInputDeviceTool *device_tool)
+ {
++  MetaBackend *backend = meta_get_backend ();
++  MetaCursorTracker *cursor_tracker = meta_backend_get_cursor_tracker (backend);
+   MetaWaylandTabletTool *tool;
+ 
+   tool = g_new0 (MetaWaylandTabletTool, 1);
+@@ -397,7 +399,8 @@ meta_wayland_tablet_tool_new (MetaWaylandTabletSeat  *seat,
+   tool->focus_surface_destroy_listener.notify = tablet_tool_handle_focus_surface_destroy;
+   tool->cursor_surface_destroy_listener.notify = tablet_tool_handle_cursor_surface_destroy;
+ 
+-  tool->default_sprite = meta_cursor_sprite_xcursor_new (META_CURSOR_CROSSHAIR);
++  tool->default_sprite = meta_cursor_sprite_xcursor_new (META_CURSOR_CROSSHAIR,
++                                                         cursor_tracker);
+   tool->prepare_at_signal_id =
+     g_signal_connect (tool->default_sprite, "prepare-at",
+                       G_CALLBACK (tool_cursor_prepare_at), tool);
+-- 
+2.33.1
+
+
+From 4714fa052912276b744cf252422d26d32dd57978 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Mon, 15 Nov 2021 14:25:55 +0100
+Subject: [PATCH 09/13] cursor-tracker: Add missing newline
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2147>
+(cherry picked from commit c87779f62e9c49a853d12812a76cefa8560bfaa4)
+---
+ src/backends/meta-cursor-tracker.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/backends/meta-cursor-tracker.c b/src/backends/meta-cursor-tracker.c
+index 0078fd6d4823..a330cd995765 100644
+--- a/src/backends/meta-cursor-tracker.c
++++ b/src/backends/meta-cursor-tracker.c
+@@ -525,6 +525,7 @@ meta_cursor_tracker_set_pointer_visible (MetaCursorTracker *tracker,
+ 
+   g_signal_emit (tracker, signals[VISIBILITY_CHANGED], 0);
+ }
++
+ MetaBackend *
+ meta_cursor_tracker_get_backend (MetaCursorTracker *tracker)
+ {
+-- 
+2.33.1
+
+
+From 53b1ad28ce20e007a6a57b5d0c920dda3a9cf3fc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Thu, 9 Dec 2021 11:11:24 +0100
+Subject: [PATCH 10/13] backend: Return NULL cursor renderer if there is no
+ seat
+
+During tear down, if anything teared down after the seat tries to get
+the cursor renderer, we'd crash trying to get it as the seat would
+already be gone. Avoid this by returning NULL when there is no seat.
+
+It's assumed that any path that will happen during tear down that relies
+on getting the cursor renderer will gracefully handle it not being
+present, e.g. by relying on the cursor rendering cleaning up itself.
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2147>
+(cherry picked from commit ada524265fdcae827d67191b47e4c128c08c9d8f)
+---
+ src/backends/meta-backend.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/backends/meta-backend.c b/src/backends/meta-backend.c
+index f4fceeb4eeb3..87e0b3bba12d 100644
+--- a/src/backends/meta-backend.c
++++ b/src/backends/meta-backend.c
+@@ -1226,6 +1226,9 @@ meta_backend_get_cursor_renderer (MetaBackend *backend)
+   MetaBackendPrivate *priv = meta_backend_get_instance_private (backend);
+   ClutterInputDevice *pointer;
+ 
++  if (!priv->default_seat)
++    return NULL;
++
+   pointer = clutter_seat_get_pointer (priv->default_seat);
+ 
+   return meta_backend_get_cursor_renderer_for_device (backend, pointer);
+-- 
+2.33.1
+
+
+From 8eeccfc349ec898d17e2c57229e64a010c72b319 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Mon, 15 Nov 2021 14:27:54 +0100
+Subject: [PATCH 11/13] cursor-renderer/native: Clear GPU state before closing
+ device
+
+This ensures we don't have any left over cursor GPU buffers (via
+gbm_bo's) after destroying the corresponding gbm_device (owned by
+MetaRenderDevice).
+
+Fixes crashes with backtraces such as
+
+  1) meta_drm_buffer_gbm_finalize at ../src/backends/native/meta-drm-buffer-gbm.c:450
+  4) invalidate_cursor_gpu_state at ../src/backends/native/meta-cursor-renderer-native.c:1167
+  9) update_cursor_sprite_texture at ../src/wayland/meta-wayland-cursor-surface.c:70
+ 10) meta_wayland_surface_role_apply_state at ../src/wayland/meta-wayland-surface.c:1869
+ 11) meta_wayland_surface_apply_state at ../src/wayland/meta-wayland-surface.c:832
+ 12) meta_wayland_surface_commit at ../src/wayland/meta-wayland-surface.c:993
+ 13) wl_surface_commit at ../src/wayland/meta-wayland-surface.c:1158
+ 14) ffi_call_unix64 at ../src/x86/unix64.S:76
+ 15) ffi_call at ../src/x86/ffi64.c:525
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2147>
+(cherry picked from commit 4159c76a5b5b0fd0dfff8c9ba6b8269aedaebfec)
+---
+ .../native/meta-cursor-renderer-native.c      | 14 ++++++++
+ .../native/meta-cursor-renderer-native.h      |  5 +++
+ .../native/meta-renderer-native-private.h     |  1 +
+ src/backends/native/meta-renderer-native.c    | 35 +++++++++++++++++++
+ 4 files changed, 55 insertions(+)
+
+diff --git a/src/backends/native/meta-cursor-renderer-native.c b/src/backends/native/meta-cursor-renderer-native.c
+index d9e4a7e1d71f..81f4da05cbf6 100644
+--- a/src/backends/native/meta-cursor-renderer-native.c
++++ b/src/backends/native/meta-cursor-renderer-native.c
+@@ -1876,3 +1876,17 @@ static void
+ meta_cursor_renderer_native_init (MetaCursorRendererNative *native)
+ {
+ }
++
++void
++meta_cursor_renderer_native_invalidate_gpu_state (MetaCursorRendererNative *native,
++                                                  MetaCursorSprite         *cursor_sprite,
++                                                  MetaGpuKms               *gpu_kms)
++{
++  MetaCursorNativePrivate *cursor_priv;
++
++  cursor_priv = get_cursor_priv (cursor_sprite);
++  if (!cursor_priv)
++    return;
++
++  g_hash_table_remove (cursor_priv->gpu_states, gpu_kms);
++}
+diff --git a/src/backends/native/meta-cursor-renderer-native.h b/src/backends/native/meta-cursor-renderer-native.h
+index 5113b96ce18e..72b7b3c35f56 100644
+--- a/src/backends/native/meta-cursor-renderer-native.h
++++ b/src/backends/native/meta-cursor-renderer-native.h
+@@ -26,6 +26,7 @@
+ #define META_CURSOR_RENDERER_NATIVE_H
+ 
+ #include "backends/meta-cursor-renderer.h"
++#include "backends/native/meta-backend-native-types.h"
+ #include "meta/meta-backend.h"
+ 
+ #define META_TYPE_CURSOR_RENDERER_NATIVE (meta_cursor_renderer_native_get_type ())
+@@ -39,4 +40,8 @@ void meta_cursor_renderer_native_prepare_frame (MetaCursorRendererNative *cursor
+ MetaCursorRendererNative * meta_cursor_renderer_native_new (MetaBackend        *backend,
+                                                             ClutterInputDevice *device);
+ 
++void meta_cursor_renderer_native_invalidate_gpu_state (MetaCursorRendererNative *native,
++                                                       MetaCursorSprite         *cursor_sprite,
++                                                       MetaGpuKms               *gpu_kms);
++
+ #endif /* META_CURSOR_RENDERER_NATIVE_H */
+diff --git a/src/backends/native/meta-renderer-native-private.h b/src/backends/native/meta-renderer-native-private.h
+index acadb3fff90a..9d51a51c86b1 100644
+--- a/src/backends/native/meta-renderer-native-private.h
++++ b/src/backends/native/meta-renderer-native-private.h
+@@ -50,6 +50,7 @@ typedef struct _MetaRendererNativeGpuData
+   MetaRendererNative *renderer_native;
+ 
+   MetaDeviceFile *device_file;
++  MetaGpuKms *gpu_kms;
+ 
+   struct {
+     struct gbm_device *device;
+diff --git a/src/backends/native/meta-renderer-native.c b/src/backends/native/meta-renderer-native.c
+index 75751fb67280..3b08b1c18f99 100644
+--- a/src/backends/native/meta-renderer-native.c
++++ b/src/backends/native/meta-renderer-native.c
+@@ -46,9 +46,11 @@
+ #include <string.h>
+ #include <unistd.h>
+ 
++#include "backends/meta-cursor-tracker-private.h"
+ #include "backends/meta-gles3.h"
+ #include "backends/meta-logical-monitor.h"
+ #include "backends/native/meta-backend-native-private.h"
++#include "backends/native/meta-cursor-renderer-native.h"
+ #include "backends/native/meta-cogl-utils.h"
+ #include "backends/native/meta-crtc-kms.h"
+ #include "backends/native/meta-crtc-virtual.h"
+@@ -121,6 +123,11 @@ meta_renderer_native_gpu_data_free (MetaRendererNativeGpuData *renderer_gpu_data
+ {
+   MetaRendererNative *renderer_native = renderer_gpu_data->renderer_native;
+   MetaEgl *egl = meta_renderer_native_get_egl (renderer_native);
++  MetaRenderer *renderer = META_RENDERER (renderer_gpu_data->renderer_native);
++  MetaBackend *backend = meta_renderer_get_backend (renderer);
++  MetaCursorRenderer *cursor_renderer;
++  MetaGpuKms *gpu_kms;
++  GList *l;
+ 
+   if (renderer_gpu_data->secondary.egl_context != EGL_NO_CONTEXT)
+     {
+@@ -130,11 +137,33 @@ meta_renderer_native_gpu_data_free (MetaRendererNativeGpuData *renderer_gpu_data
+                                 NULL);
+     }
+ 
++  cursor_renderer = meta_backend_get_cursor_renderer (backend);
++  gpu_kms = renderer_gpu_data->gpu_kms;
++  if (cursor_renderer && gpu_kms)
++    {
++      MetaCursorRendererNative *cursor_renderer_native =
++        META_CURSOR_RENDERER_NATIVE (cursor_renderer);
++      MetaCursorTracker *cursor_tracker =
++        meta_backend_get_cursor_tracker (backend);
++      GList *cursor_sprites =
++        meta_cursor_tracker_peek_cursor_sprites (cursor_tracker);
++
++      for (l = cursor_sprites; l; l = l->next)
++        {
++          MetaCursorSprite *cursor_sprite = META_CURSOR_SPRITE (l->data);
++
++          meta_cursor_renderer_native_invalidate_gpu_state (cursor_renderer_native,
++                                                            cursor_sprite,
++                                                            gpu_kms);
++        }
++    }
++
+   if (renderer_gpu_data->egl_display != EGL_NO_DISPLAY)
+     meta_egl_terminate (egl, renderer_gpu_data->egl_display, NULL);
+ 
+   g_clear_pointer (&renderer_gpu_data->gbm.device, gbm_device_destroy);
+   g_clear_pointer (&renderer_gpu_data->device_file, meta_device_file_release);
++
+   g_free (renderer_gpu_data);
+ }
+ 
+@@ -1588,6 +1617,7 @@ init_gbm_egl_display (MetaRendererNative  *renderer_native,
+ 
+ static MetaRendererNativeGpuData *
+ create_renderer_gpu_data_gbm (MetaRendererNative  *renderer_native,
++                              MetaGpuKms          *gpu_kms,
+                               MetaDeviceFile      *device_file,
+                               GError             **error)
+ {
+@@ -1607,6 +1637,7 @@ create_renderer_gpu_data_gbm (MetaRendererNative  *renderer_native,
+   renderer_gpu_data = meta_create_renderer_native_gpu_data ();
+   renderer_gpu_data->device_file = meta_device_file_acquire (device_file);
+   renderer_gpu_data->renderer_native = renderer_native;
++  renderer_gpu_data->gpu_kms = gpu_kms;
+   renderer_gpu_data->gbm.device = gbm_device;
+   renderer_gpu_data->mode = META_RENDERER_NATIVE_MODE_GBM;
+ 
+@@ -1813,6 +1844,7 @@ count_drm_devices (MetaRendererNative *renderer_native)
+ 
+ static MetaRendererNativeGpuData *
+ create_renderer_gpu_data_egl_device (MetaRendererNative  *renderer_native,
++                                     MetaGpuKms          *gpu_kms,
+                                      MetaDeviceFile      *device_file,
+                                      GError             **error)
+ {
+@@ -1873,6 +1905,7 @@ create_renderer_gpu_data_egl_device (MetaRendererNative  *renderer_native,
+   renderer_gpu_data->egl.device = egl_device;
+   renderer_gpu_data->mode = META_RENDERER_NATIVE_MODE_EGL_DEVICE;
+   renderer_gpu_data->egl_display = egl_display;
++  renderer_gpu_data->gpu_kms = gpu_kms;
+ 
+   return renderer_gpu_data;
+ }
+@@ -1911,6 +1944,7 @@ meta_renderer_native_create_renderer_gpu_data (MetaRendererNative  *renderer_nat
+     return NULL;
+ 
+   gbm_renderer_gpu_data = create_renderer_gpu_data_gbm (renderer_native,
++                                                        gpu_kms,
+                                                         device_file,
+                                                         &gbm_error);
+   if (gbm_renderer_gpu_data)
+@@ -1922,6 +1956,7 @@ meta_renderer_native_create_renderer_gpu_data (MetaRendererNative  *renderer_nat
+ #ifdef HAVE_EGL_DEVICE
+   egl_stream_renderer_gpu_data =
+     create_renderer_gpu_data_egl_device (renderer_native,
++                                         gpu_kms,
+                                          device_file,
+                                          &egl_device_error);
+   if (egl_stream_renderer_gpu_data)
+-- 
+2.33.1
+
+
+From 7ab1853a9981fcafac6896eff71bf2626a33b625 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Thu, 9 Dec 2021 11:18:21 +0100
+Subject: [PATCH 12/13] renderer/native: Don't clear GPU data with pending page
+ flips
+
+An incorrect assumption that after mode set there would be no pending
+page flips was made. This meant that if there was a mode set, followed
+by a page flip, if that page flip was for a CRTC on a now unused GPU,
+we'd crash due to the renderer GPU data having already been freed. This
+commit avoids that by keeping it alive as long as the page flips are
+still in the air. It fixes crashes with backtraces such as
+
+  0) meta_render_device_get_egl_display (render_device=0x0)
+     at ../src/backends/native/meta-render-device.c:320
+  1) secondary_gpu_state_free (secondary_gpu_state=0x1c8cc30)
+     at ../src/backends/native/meta-onscreen-native.c:560
+  2) meta_onscreen_native_dispose (object=0x1cb65e0)
+     at ../src/backends/native/meta-onscreen-native.c:2168
+  3) g_object_unref (_object=<optimized out>)
+     at ../gobject/gobject.c:3540
+  4) g_object_unref (_object=0x1cb65e0)
+     at ../gobject/gobject.c:3470
+  5) clutter_stage_view_finalize (object=0x1cbb450)
+     at ../clutter/clutter/clutter-stage-view.c:1412
+  6) g_object_unref (_object=<optimized out>)
+     at ../gobject/gobject.c:3578
+  7) g_object_unref (_object=0x1cbb450)
+     at ../gobject/gobject.c:3470
+  8) meta_kms_page_flip_closure_free (closure=0x1d47e60)
+     at ../src/backends/native/meta-kms-page-flip.c:76
+  9) g_list_foreach (list=<optimized out>, func=0x7fb3ada67111 <meta_kms_page_flip_closure_free>, user_data=0x0)
+     at ../glib/glist.c:1090
+ 10) g_list_free_full (list=0x1cb4d20 = {...}, free_func=<optimized out>)
+     at ../glib/glist.c:244
+ 11) meta_kms_page_flip_data_unref (page_flip_data=0x1c65510)
+     at ../src/backends/native/meta-kms-page-flip.c:109
+ 12) meta_kms_callback_data_free (callback_data=0x227ebf0)
+     at ../src/backends/native/meta-kms.c:372
+ 13) flush_callbacks (kms=0x18e2630)
+     at ../src/backends/native/meta-kms.c:391
+ 14) callback_idle (user_data=0x18e2630)
+     at ../src/backends/native/meta-kms.c
+
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2147>
+(cherry picked from commit 287908e05ad310f3c27009a4ca6bfb40ee65c973)
+---
+ src/backends/native/meta-onscreen-native.c |  6 ++
+ src/backends/native/meta-onscreen-native.h |  2 +
+ src/backends/native/meta-renderer-native.c | 74 +++++++++++++++++++---
+ 3 files changed, 73 insertions(+), 9 deletions(-)
+
+diff --git a/src/backends/native/meta-onscreen-native.c b/src/backends/native/meta-onscreen-native.c
+index 47b0d7eefc07..e67a72aaa1bd 100644
+--- a/src/backends/native/meta-onscreen-native.c
++++ b/src/backends/native/meta-onscreen-native.c
+@@ -2179,3 +2179,9 @@ meta_onscreen_native_class_init (MetaOnscreenNativeClass *klass)
+     meta_onscreen_native_swap_buffers_with_damage;
+   onscreen_class->direct_scanout = meta_onscreen_native_direct_scanout;
+ }
++
++MetaCrtc *
++meta_onscreen_native_get_crtc (MetaOnscreenNative *onscreen_native)
++{
++  return onscreen_native->crtc;
++}
+diff --git a/src/backends/native/meta-onscreen-native.h b/src/backends/native/meta-onscreen-native.h
+index 020fc8a14ad4..5c99181d39dc 100644
+--- a/src/backends/native/meta-onscreen-native.h
++++ b/src/backends/native/meta-onscreen-native.h
+@@ -56,4 +56,6 @@ MetaOnscreenNative * meta_onscreen_native_new (MetaRendererNative *renderer_nati
+                                                int                 width,
+                                                int                 height);
+ 
++MetaCrtc * meta_onscreen_native_get_crtc (MetaOnscreenNative *onscreen_native);
++
+ #endif /* META_ONSCREEN_NATIVE_H */
+diff --git a/src/backends/native/meta-renderer-native.c b/src/backends/native/meta-renderer-native.c
+index 3b08b1c18f99..42141460ef8d 100644
+--- a/src/backends/native/meta-renderer-native.c
++++ b/src/backends/native/meta-renderer-native.c
+@@ -87,6 +87,8 @@ struct _MetaRendererNative
+   gboolean pending_mode_set;
+ 
+   GList *kept_alive_onscreens;
++  GList *lingering_onscreens;
++  guint release_unused_gpus_idle_id;
+ 
+   GList *power_save_page_flip_onscreens;
+   guint power_save_page_flip_source_id;
+@@ -663,13 +665,6 @@ meta_renderer_native_queue_power_save_page_flip (MetaRendererNative *renderer_na
+                     g_object_ref (onscreen));
+ }
+ 
+-static void
+-clear_kept_alive_onscreens (MetaRendererNative *renderer_native)
+-{
+-  g_clear_list (&renderer_native->kept_alive_onscreens,
+-                g_object_unref);
+-}
+-
+ static gboolean
+ is_gpu_unused (gpointer key,
+                gpointer value,
+@@ -703,11 +698,70 @@ free_unused_gpu_datas (MetaRendererNative *renderer_native)
+       g_hash_table_add (used_gpus, gpu);
+     }
+ 
++  for (l = renderer_native->lingering_onscreens; l; l = l->next)
++    {
++      MetaOnscreenNative *onscreen_native = META_ONSCREEN_NATIVE (l->data);
++      MetaCrtc *crtc = meta_onscreen_native_get_crtc (onscreen_native);
++
++      g_hash_table_add (used_gpus, meta_crtc_get_gpu (crtc));
++    }
++
+   g_hash_table_foreach_remove (renderer_native->gpu_datas,
+                                is_gpu_unused,
+                                used_gpus);
+ }
+ 
++static gboolean
++release_unused_gpus_idle (gpointer user_data)
++{
++  MetaRendererNative *renderer_native = META_RENDERER_NATIVE (user_data);
++
++  renderer_native->release_unused_gpus_idle_id = 0;
++  free_unused_gpu_datas (renderer_native);
++
++  return G_SOURCE_REMOVE;
++}
++
++static void
++old_onscreen_freed (gpointer  user_data,
++                    GObject  *freed_onscreen)
++{
++  MetaRendererNative *renderer_native = META_RENDERER_NATIVE (user_data);
++
++  renderer_native->lingering_onscreens =
++    g_list_remove (renderer_native->lingering_onscreens, freed_onscreen);
++
++  if (!renderer_native->release_unused_gpus_idle_id)
++    {
++      renderer_native->release_unused_gpus_idle_id =
++        g_idle_add (release_unused_gpus_idle, renderer_native);
++    }
++}
++
++static void
++clear_kept_alive_onscreens (MetaRendererNative *renderer_native)
++{
++  GList *l;
++
++  for (l = renderer_native->kept_alive_onscreens; l; l = l->next)
++    {
++      CoglOnscreen *onscreen;
++
++      if (!COGL_IS_ONSCREEN (l->data))
++        continue;
++
++      onscreen = COGL_ONSCREEN (l->data);
++      g_object_weak_ref (G_OBJECT (onscreen),
++                         old_onscreen_freed,
++                         renderer_native);
++      renderer_native->lingering_onscreens =
++        g_list_prepend (renderer_native->lingering_onscreens, onscreen);
++    }
++
++  g_clear_list (&renderer_native->kept_alive_onscreens,
++                g_object_unref);
++}
++
+ void
+ meta_renderer_native_post_mode_set_updates (MetaRendererNative *renderer_native)
+ {
+@@ -2270,8 +2324,6 @@ meta_renderer_native_finalize (GObject *object)
+ {
+   MetaRendererNative *renderer_native = META_RENDERER_NATIVE (object);
+ 
+-  clear_kept_alive_onscreens (renderer_native);
+-
+   g_clear_list (&renderer_native->power_save_page_flip_onscreens,
+                 g_object_unref);
+   g_clear_handle_id (&renderer_native->power_save_page_flip_source_id,
+@@ -2279,6 +2331,10 @@ meta_renderer_native_finalize (GObject *object)
+ 
+   g_list_free (renderer_native->pending_mode_set_views);
+ 
++  g_clear_handle_id (&renderer_native->release_unused_gpus_idle_id,
++                     g_source_remove);
++  clear_kept_alive_onscreens (renderer_native);
++
+   g_hash_table_destroy (renderer_native->gpu_datas);
+   g_clear_object (&renderer_native->gles3);
+ 
+-- 
+2.33.1
+
+
+From ea67a06332beb817099f1c1d2b5bb1a8c9a49f4b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Wed, 22 Dec 2021 19:37:16 +0100
+Subject: [PATCH 13/13] cursor: Hold reference to cursor tracker
+
+This is so that it can unregister from it on tear down. The tracker owns
+references to cursors too, but this cycle is already broken as the
+backend calls 'g_object_run_dispose()' when tearing the cursor tracker
+down.
+
+Fixes a crash on shutdown.
+---
+ src/backends/meta-cursor.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/backends/meta-cursor.c b/src/backends/meta-cursor.c
+index f8b64a42f314..9360b031e454 100644
+--- a/src/backends/meta-cursor.c
++++ b/src/backends/meta-cursor.c
+@@ -243,6 +243,7 @@ meta_cursor_sprite_finalize (GObject *object)
+   g_clear_pointer (&priv->texture, cogl_object_unref);
+ 
+   meta_cursor_tracker_unregister_cursor_sprite (priv->cursor_tracker, sprite);
++  g_clear_object (&priv->cursor_tracker);
+ 
+   G_OBJECT_CLASS (meta_cursor_sprite_parent_class)->finalize (object);
+ }
+@@ -260,7 +261,7 @@ meta_cursor_tracker_set_property (GObject      *object,
+   switch (prop_id)
+     {
+     case PROP_CURSOR_TRACKER:
+-      priv->cursor_tracker = g_value_get_object (value);
++      g_set_object (&priv->cursor_tracker, g_value_get_object (value));
+       break;
+     default:
+       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+-- 
+2.33.1
+
