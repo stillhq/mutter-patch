@@ -9,7 +9,7 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:          mutter
-Version:       41.7
+Version:       41.8
 Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
@@ -175,6 +175,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Sun Jul 03 2022 Florian Müllner <fmuellner@redhat.com> - 41.8-1
+- Update to 41.8
+
 * Sat May 28 2022 Florian Müllner <fmuellner@redhat.com> - 41.7-1
 - Update to 41.7
 
