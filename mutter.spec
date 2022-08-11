@@ -9,8 +9,8 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:          mutter
-Version:       41.8
-Release:       2%{?dist}
+Version:       41.9
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -178,6 +178,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Thu Aug 11 2022 Florian Müllner <fmuellner@redhat.com> - 41.9-1
+- Update to 41.9
+
 * Mon Jul 25 2022 Jonas Ådahl <jadahl@redhat.com> - 41.8-2
 - Revert incorrect upstream backport
   Resolves: #2110041
