@@ -26,9 +26,6 @@ Patch1:        0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
 # Workaround for RHBZ#1936991 (blocks atomic KMS on "tegra" driver)
 Patch2:        0001-Test-deny-atomic-KMS-for-tegra-RHBZ-1936991.patch
 
-# Revert incorrect upstream backport (rhbz#2110041)
-Patch3:        0001-Revert-x11-input-selection-stream-Handle-Xwayland-go.patch
-
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
 BuildRequires: gnome-desktop3-devel
