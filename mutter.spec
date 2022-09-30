@@ -10,7 +10,7 @@
 
 Name:          mutter
 Version:       42.5
-Release:       2%{?dist}
+Release:       3%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -29,6 +29,9 @@ Patch2:        mutter-42.alpha-disable-tegra.patch
 # Backport crash fix from gnome-42
 # https://bugzilla.redhat.com/show_bug.cgi?id=2127801
 Patch3:        0001-output-kms-Don-t-attemp-to-add-common-modes-on-conne.patch
+# https://bugzilla.redhat.com/show_bug.cgi?id=2127760
+Patch4:        0001-wayland-Add-destruction-listener-to-activation-token.patch
+Patch5:        0002-wayland-Unlink-surface-listener-when-freeing-token.patch
 
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.41.0
 BuildRequires: pkgconfig(sm)
@@ -173,6 +176,10 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Fri Sep 30 2022 Jonas Ådahl <jadahl@redhat.com> - 42.5-3
+- Backport crash fix from gnome-42
+  Resolves: #2127760
+
 * Thu Sep 29 2022 Jonas Ådahl <jadahl@redhat.com> - 42.5-2
 - Backport crash fix from gnome-42
   Resolves: #2127801
