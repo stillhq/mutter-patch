@@ -26,13 +26,6 @@ Patch1:        0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
 # https://bugzilla.redhat.com/show_bug.cgi?id=1936991
 Patch2:        mutter-42.alpha-disable-tegra.patch
 
-# Backport crash fix from gnome-42
-# https://bugzilla.redhat.com/show_bug.cgi?id=2127801
-Patch3:        0001-output-kms-Don-t-attemp-to-add-common-modes-on-conne.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=2127760
-Patch4:        0001-wayland-Add-destruction-listener-to-activation-token.patch
-Patch5:        0002-wayland-Unlink-surface-listener-when-freeing-token.patch
-
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.41.0
 BuildRequires: pkgconfig(sm)
 BuildRequires: pkgconfig(libwacom)
