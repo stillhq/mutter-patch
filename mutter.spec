@@ -9,8 +9,8 @@
 %global tarball_version %%(echo %{version} | tr '~' '.')
 
 Name:          mutter
-Version:       42.5
-Release:       3%{?dist}
+Version:       42.6
+Release:       1%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -176,6 +176,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Wed Oct 26 2022 Florian Müllner <fmuellner@redhat.com> 42.6-1
+- Update to 42.6
+
 * Fri Sep 30 2022 Jonas Ådahl <jadahl@redhat.com> - 42.5-3
 - Backport crash fix from gnome-42
   Resolves: #2127760
@@ -185,7 +188,7 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
   Resolves: #2127801
 
 * Sat Sep 17 2022 Florian Müllner <fmuellner@redhat.com> - 42.5-1
--  Update to 42.5
+- Update to 42.5
 
 * Thu Aug 11 2022 Florian Müllner <fmuellner@redhat.com> - 42.4-1
 - Update to 42.4
