@@ -1,0 +1,52 @@
+From f880d2a0213a4bc096ac0d088a1315320f1e5cc5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jonas=20=C3=85dahl?= <jadahl@gmail.com>
+Date: Fri, 2 Sep 2022 16:49:29 +0200
+Subject: [PATCH] x11/session: Set the context as client data on connection
+ watch
+
+It was already assumed to be the context, but we never set it as such,
+so things just crashed instead. Now when we set it up correctly,
+hopefully that won't happen anymore.
+
+Closes: https://gitlab.gnome.org/GNOME/mutter/-/issues/2406
+Closes: https://gitlab.gnome.org/GNOME/mutter/-/issues/2267
+Closes: https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/5078
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2609>
+---
+ src/x11/session.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/x11/session.c b/src/x11/session.c
+index 339a7ae335..82e09e3f00 100644
+--- a/src/x11/session.c
++++ b/src/x11/session.c
+@@ -175,7 +175,7 @@ ice_io_error_handler (IceConn connection)
+ }
+ 
+ static void
+-ice_init (void)
++ice_init (MetaContext *context)
+ {
+   static gboolean ice_initted = FALSE;
+ 
+@@ -189,7 +189,7 @@ ice_init (void)
+       if (ice_installed_handler == default_handler)
+ 	ice_installed_handler = NULL;
+ 
+-      IceAddConnectionWatch (new_ice_connection, NULL);
++      IceAddConnectionWatch (new_ice_connection, context);
+ 
+       ice_initted = TRUE;
+     }
+@@ -272,7 +272,7 @@ meta_session_init (MetaContext *context,
+       saved_client_id = NULL;
+     }
+ 
+-  ice_init ();
++  ice_init (context);
+ 
+   mask = SmcSaveYourselfProcMask | SmcDieProcMask |
+     SmcSaveCompleteProcMask | SmcShutdownCancelledProcMask;
+-- 
+2.38.1
+

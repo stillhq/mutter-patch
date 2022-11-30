@@ -10,7 +10,7 @@
 
 Name:          mutter
 Version:       41.9
-Release:       1%{?dist}
+Release:       2%{?dist}
 Summary:       Window and compositing manager based on Clutter
 
 License:       GPLv2+
@@ -25,6 +25,11 @@ Patch1:        0001-Revert-build-Do-not-provide-built-sources-as-libmutt.patch
 
 # Workaround for RHBZ#1936991 (blocks atomic KMS on "tegra" driver)
 Patch2:        0001-Test-deny-atomic-KMS-for-tegra-RHBZ-1936991.patch
+
+# Fix an occasional crash (e.g. on logout)
+# https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/2609
+# https://bugzilla.redhat.com/show_bug.cgi?id=2036604
+Patch3:        0001-x11-session-Set-the-context-as-client-data-on-connec.patch
 
 BuildRequires: pango-devel
 BuildRequires: startup-notification-devel
@@ -175,6 +180,9 @@ desktop-file-validate %{buildroot}/%{_datadir}/applications/%{name}.desktop
 %{_datadir}/mutter-%{mutter_api_version}/tests
 
 %changelog
+* Wed Nov 30 2022 Adam Williamson <awilliam@redhat.com> - 41.9-2
+- Backport MR #2609 to fix #2036604
+
 * Thu Aug 11 2022 Florian Müllner <fmuellner@redhat.com> - 41.9-1
 - Update to 41.9
 
