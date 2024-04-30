@@ -5,9 +5,14 @@
 %global json_glib_version 0.12.0
 %global libinput_version 1.19.0
 %global pipewire_version 0.3.33
+%global pixman_version 0.42
+%global wayland_protocols_version 1.33
+%global wayland_server_version 1.22
 %global lcms2_version 2.6
 %global colord_version 1.4.5
+%global libdrm_version 2.4.118
 %global libei_version 1.0.0
+%global libglvnd_version 1.6.0
 %global mutter_api_version 14
 
 %global tarball_version %%(echo %{version} | tr '~' '.')
@@ -49,9 +54,14 @@ Patch: 0001-modified-3329.patch
 # Fix problem with popups not displaying in openQA tests
 Patch: 3721.patch
 
+# https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/3726
+# Annotate libglvnd version requirement
+Patch:         0001-build-document-libglvnd-version-requirement.patch
+
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.41.0
 BuildRequires: pkgconfig(sm)
 BuildRequires: pkgconfig(libwacom)
+BuildRequires: pkgconfig(pixman-1) >= %{pixman_version}
 BuildRequires: pkgconfig(x11)
 BuildRequires: pkgconfig(xdamage)
 BuildRequires: pkgconfig(xext)
@@ -71,6 +81,7 @@ BuildRequires: mesa-libGLES-devel
 BuildRequires: mesa-libGL-devel
 BuildRequires: mesa-libgbm-devel
 BuildRequires: pkgconfig(glesv2)
+BuildRequires: pkgconfig(libglvnd) >= %{libglvnd_version}
 BuildRequires: pkgconfig(graphene-gobject-1.0)
 BuildRequires: pam-devel
 BuildRequires: pkgconfig(libdisplay-info)
@@ -91,11 +102,11 @@ BuildRequires: meson
 BuildRequires: pkgconfig(gbm)
 BuildRequires: pkgconfig(gnome-desktop-4)
 BuildRequires: pkgconfig(gudev-1.0)
-BuildRequires: pkgconfig(libdrm)
+BuildRequires: pkgconfig(libdrm) >= %{libdrm_version}
 BuildRequires: pkgconfig(libstartup-notification-1.0)
 BuildRequires: pkgconfig(wayland-eglstream)
-BuildRequires: pkgconfig(wayland-protocols)
-BuildRequires: pkgconfig(wayland-server)
+BuildRequires: pkgconfig(wayland-protocols) >= %{wayland_protocols_version}
+BuildRequires: pkgconfig(wayland-server) >= %{wayland_server_version}
 BuildRequires: pkgconfig(lcms2) >= %{lcms2_version}
 BuildRequires: pkgconfig(colord) >= %{colord_version}
 BuildRequires: pkgconfig(libei-1.0) >= %{libei_version}

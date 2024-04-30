@@ -1,0 +1,60 @@
+From c6c96e463f4d677ef3245753766e7041cb418414 Mon Sep 17 00:00:00 2001
+From: Michel Lind <salimma@fedoraproject.org>
+Date: Tue, 30 Apr 2024 14:21:12 -0500
+Subject: [PATCH] build: document libglvnd version requirement
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+```
+../cogl/cogl/driver/gl/gles/cogl-driver-gles.c: In function ‘_cogl_driver_pixel_format_to_gl’:
+../cogl/cogl/driver/gl/gles/cogl-driver-gles.c:168:25: error: ‘GL_RG8_EXT’ undeclared (first use in this function); did you mean ‘GL_RGB8_EXT’?
+  168 |           glintformat = GL_RG8_EXT;
+      |                         ^~~~~~~~~~
+      |                         GL_RGB8_EXT
+```
+=> added in https://github.com/NVIDIA/libglvnd/commit/fd1df5e9891dec71013a272e7132f1a33e45f5b5
+
+Signed-off-by: Michel Lind <salimma@fedoraproject.org>
+---
+ cogl/meson.build | 1 +
+ meson.build      | 4 ++++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/cogl/meson.build b/cogl/meson.build
+index 25120f954..b1b856c73 100644
+--- a/cogl/meson.build
++++ b/cogl/meson.build
+@@ -31,6 +31,7 @@ endif
+ if have_egl
+   cogl_pkg_deps += [
+     egl_dep,
++    libglvnd_dep,
+   ]
+ endif
+ 
+diff --git a/meson.build b/meson.build
+index 50c751263..66c392916 100644
+--- a/meson.build
++++ b/meson.build
+@@ -44,6 +44,9 @@ libei_req = '>= 1.0.901'
+ udev_req = '>= 228'
+ gudev_req = '>= 232'
+ 
++# egl version requirements
++libglvnd_req = '>= 1.6.0'
++
+ # wayland version requirements
+ wayland_server_req = '>= 1.22'
+ wayland_protocols_req = '>= 1.33'
+@@ -191,6 +194,7 @@ endif
+ have_egl = get_option('egl')
+ if have_egl
+   egl_dep = dependency('egl')
++  libglvnd_dep = dependency('libglvnd', version: libglvnd_req)
+ endif
+ 
+ have_glx = get_option('glx') and have_x11_client
+-- 
+2.44.0
+
