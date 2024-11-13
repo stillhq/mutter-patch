@@ -42,6 +42,12 @@ Patch:         0001-Revert-x11-Use-input-region-from-frame-window-for-de.patch
 # which solves the problems reported with #3329 alone
 Patch: 0001-modified-3329.patch
 
+# https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/3565
+# https://gitlab.gnome.org/GNOME/mutter/-/issues/3278
+# https://bugzilla.redhat.com/show_bug.cgi?id=2247659
+# Fix an occasional crash on user switch
+Patch: 0001-onscreen-native-Notify-frame-complete-on-failure-to-.patch
+
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.41.0
 BuildRequires: pkgconfig(sm)
 BuildRequires: pkgconfig(libwacom)

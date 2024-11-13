@@ -1,0 +1,41 @@
+From de3934efa8485369279439a010be2a60f7906e80 Mon Sep 17 00:00:00 2001
+From: Daniel van Vugt <daniel.van.vugt@canonical.com>
+Date: Wed, 7 Feb 2024 15:16:43 +0800
+Subject: [PATCH] onscreen/native: Notify frame complete on failure to lock
+ front buffer
+
+If such a failure is followed by a successful frame then the Cogl frame
+queue would have size 2, leading to an assertion failure in
+`meta_onscreen_native_notify_frame_complete`:
+
+```
+g_assert (!cogl_onscreen_peek_head_frame_info (onscreen));
+```
+
+Notifying on the failure however keeps the Cogl frame queue limited to
+a size of 1 and we recover gracefully with only a missed frame and a
+warning message.
+
+Closes: https://gitlab.gnome.org/GNOME/mutter/-/issues/3278
+Part-of: <https://gitlab.gnome.org/GNOME/mutter/-/merge_requests/3565>
+---
+ src/backends/native/meta-onscreen-native.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/backends/native/meta-onscreen-native.c b/src/backends/native/meta-onscreen-native.c
+index 2388a44a2..c81e4aa0e 100644
+--- a/src/backends/native/meta-onscreen-native.c
++++ b/src/backends/native/meta-onscreen-native.c
+@@ -1110,6 +1110,9 @@ meta_onscreen_native_swap_buffers_with_damage (CoglOnscreen  *onscreen,
+           g_warning ("Failed to lock front buffer on %s: %s",
+                      meta_device_file_get_path (render_device_file),
+                      error->message);
++
++          frame_info->flags |= COGL_FRAME_INFO_FLAG_SYMBOLIC;
++          meta_onscreen_native_notify_frame_complete (onscreen);
+           return;
+         }
+ 
+-- 
+2.47.0
+
