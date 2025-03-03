@@ -33,6 +33,8 @@ Patch:         0001-place-Always-center-initial-setup-fedora-welcome.patch
 # https://pagure.io/fedora-workstation/issue/357
 Patch:         0001-gschema-Enable-fractional-scaling-experimental-featu.patch
 
+Patch:         0001-export-set-wm-class.patch
+
 BuildRequires: pkgconfig(gobject-introspection-1.0) >= 1.41.0
 BuildRequires: pkgconfig(sm)
 BuildRequires: pkgconfig(libwacom)
