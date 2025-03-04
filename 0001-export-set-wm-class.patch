@@ -7,7 +7,7 @@ index 8f55e97c8..a0bb6736d 100644
  const char * meta_window_get_wm_class_instance (MetaWindow *window);
  
 +META_EXPORT
-+void * meta_window_set_wm_class (MetaWindow *window, const char *wm_class, const char *wm_instance);
++void meta_window_set_wm_class (MetaWindow *window, const char *wm_class, const char *wm_instance);
 +
  META_EXPORT
  gboolean    meta_window_showing_on_its_workspace (MetaWindow *window);
